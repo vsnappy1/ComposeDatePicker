@@ -1,21 +1,17 @@
 package com.vsnappy1.composecalendar.ui.viewmodel
 
+import android.icu.util.Calendar
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vsnappy1.composecalendar.data.Constant
 import com.vsnappy1.composecalendar.ui.model.CalendarUiState
+import com.vsnappy1.composecalendar.ui.model.Date
 
 class CalendarViewModel : ViewModel() {
 
     private var _uiState = MutableLiveData(CalendarUiState())
     val uiState: LiveData<CalendarUiState> = _uiState
-
-    fun updateSelectedMonth(month: Int) {
-        _uiState.value?.apply {
-            _uiState.value = this.copy(currentVisibleMonth = availableMonths[month])
-        }
-    }
 
     fun updateCurrentVisibleMonth(month: Int) {
         _uiState.value?.apply {
@@ -23,23 +19,13 @@ class CalendarViewModel : ViewModel() {
         }
     }
 
-    fun updateSelectedDayOfMonth(day: Int) {
+    fun updateSelectedDayAndMonth(day: Int) {
         _uiState.value = _uiState.value?.let {
             _uiState.value?.copy(
                 selectedDayOfMonth = day,
                 selectedMonth = it.currentVisibleMonth
             )
         }
-    }
-
-    fun updateAvailableMonths() {
-        _uiState.value?.let {
-            _uiState.value = it.copy(availableMonths = Constant.getMonths(it.selectedYear))
-        }
-    }
-
-    fun updateIsMonthYearViewVisible(visible: Boolean) {
-        _uiState.value = _uiState.value?.copy(isMonthYearViewVisible = visible)
     }
 
     fun updateUiState(uiState: CalendarUiState) {
@@ -90,5 +76,34 @@ class CalendarViewModel : ViewModel() {
             availableMonths = newMonthList,
             currentVisibleMonth = newMonthList[_uiState.value?.currentVisibleMonth?.number ?: 0]
         )
+    }
+
+    fun setDate(date: Date) {
+        val yearMin = Constant.years.first()
+        val yearMax = Constant.years.last()
+
+        if (date.year < yearMin || date.year > yearMax) {
+            throw IllegalArgumentException("Invalid year: ${date.year}, year value must be between $yearMin to $yearMax.")
+        }
+        if (date.month < 0 || date.month > 11) {
+            throw IllegalArgumentException("Invalid month: ${date.month}, month value must be between 0 to 11.")
+        }
+
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.YEAR, date.year)
+        calendar.set(Calendar.MONTH, date.month)
+
+        val maxDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        if (date.day < 1) {
+            throw IllegalArgumentException("Invalid day: ${date.day}, day value must be greater than zero.")
+        }
+        if (date.day > maxDays) {
+            throw IllegalArgumentException("Invalid day: ${date.day}, day value must be less than equal to $maxDays for given month.")
+        }
+
+        val index = Constant.years.indexOf(date.year)
+        updateSelectedYearIndex(index)
+        updateCurrentVisibleMonth(date.month)
+        updateSelectedDayAndMonth(date.day)
     }
 }

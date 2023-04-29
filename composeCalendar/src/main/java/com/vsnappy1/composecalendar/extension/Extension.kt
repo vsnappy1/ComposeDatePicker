@@ -8,8 +8,8 @@ import androidx.compose.ui.composed
 
 
 // TODO refactor code to make it more readable
-// TODO make it scalable like shrinking it does not mess with the ui (responsive)
-// TODO add configuration for setting the properties
+// TODO add sliding effect when next or previous arrow is pressed
+// TODO when month or year is selected move to that month
 // TODO Develop Time Picker
 
 fun Int.isLeapYear(): Boolean {
