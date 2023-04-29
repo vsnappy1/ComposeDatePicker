@@ -1,5 +1,6 @@
 package com.vsnappy1.composecalendar.ui
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.animateFloatAsState
@@ -23,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
@@ -32,6 +34,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +62,7 @@ import com.vsnappy1.composecalendar.ui.model.DefaultDate
 import com.vsnappy1.composecalendar.ui.model.HeaderConfiguration
 import com.vsnappy1.composecalendar.ui.model.MonthYearViewConfiguration
 import com.vsnappy1.composecalendar.ui.viewmodel.CalendarViewModel
+import kotlinx.coroutines.launch
 import kotlin.math.ceil
 import kotlin.streams.toList
 
@@ -94,7 +101,7 @@ fun Calendar(
         Spacer(modifier = Modifier.height(small))
         Box(
             modifier = Modifier
-                .height(dateViewConfiguration.selectedDateBackgroundSize * 8f + medium)
+                .height(dateViewConfiguration.selectedDateBackgroundSize * 8f + small)
                 .padding(top = headerConfiguration.height)
         ) {
             AnimatedFadeVisibility(
@@ -128,7 +135,7 @@ fun Calendar(
                     selectedYear = uiState.selectedYearIndex,
                     onYearChange = { viewModel.updateSelectedYearIndex(it) },
                     years = uiState.availableYears.stream().map { it.toString() }.toList(),
-                    configuration = monthYearViewConfiguration
+                    configuration = monthYearViewConfiguration.copy(height = dateViewConfiguration.selectedDateBackgroundSize * 7)
                 )
             }
         }
@@ -160,29 +167,46 @@ private fun MonthAndYearView(
     years: List<String>,
     configuration: MonthYearViewConfiguration
 ) {
-    Row(
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
             .background(
                 color = configuration.backgroundColor,
                 shape = configuration.backgroundShape
             ),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
     ) {
-        SwipeLazyColumn(
-            selectedIndex = selectedMonth,
-            onSelectedIndexChange = onMonthChange,
-            items = months,
-            configuration = configuration
+        Box(
+            modifier = modifier
+                .padding(horizontal = medium)
+                .fillMaxWidth()
+                .height(40.dp)
+                .background(
+                    color = Color.Gray.copy(alpha = 0.3f),
+                    shape = RoundedCornerShape(small)
+                )
         )
-        SwipeLazyColumn(
-            selectedIndex = selectedYear,
-            onSelectedIndexChange = onYearChange,
-            items = years,
-            configuration = configuration
-        )
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SwipeLazyColumn(
+                selectedIndex = selectedMonth,
+                onSelectedIndexChange = onMonthChange,
+                items = months,
+                configuration = configuration
+            )
+            SwipeLazyColumn(
+                selectedIndex = selectedYear,
+                onSelectedIndexChange = onYearChange,
+                items = years,
+                alignment = Alignment.CenterEnd,
+                configuration = configuration
+            )
+        }
     }
+
 }
 
 @Composable
@@ -191,16 +215,20 @@ private fun SwipeLazyColumn(
     selectedIndex: Int,
     onSelectedIndexChange: (Int) -> Unit,
     items: List<String>,
+    alignment: Alignment = Alignment.CenterStart,
     configuration: MonthYearViewConfiguration
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    var isManualScrolling by remember { mutableStateOf(true) }
     val listState = rememberLazyListState()
+
     LaunchedEffect(key1 = Unit) {
         listState.scrollToItem(selectedIndex)
     }
 
-    if (listState.isScrollInProgress) {
+    if (isManualScrolling) { // Because I don't want this to interfere when item is clicked and scrolling starts
         LaunchedEffect(key1 = listState.firstVisibleItemScrollOffset) {
-            onSelectedIndexChange(listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > configuration.height.value / configuration.numberOfRowsDisplayed) 1 else 0)
+            onSelectedIndexChange(listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > configuration.height.value / configuration.numberOfRowsDisplayed + 20) 1 else 0)
             listState.animateScrollToItem(selectedIndex)
         }
     }
@@ -224,9 +252,17 @@ private fun SwipeLazyColumn(
                     Text(
                         text = items[it - index],
                         modifier = Modifier
-                            .align(Alignment.Center)
-                            .scale(scale),
-                        textAlign = TextAlign.Center,
+                            .align(alignment)
+                            .scale(scale)
+                            .noRippleClickable {
+                                Log.d("--TAG", "SwipeLazyColumn: $it")
+                                onSelectedIndexChange(it - index)
+                                coroutineScope.launch {
+                                    isManualScrolling = false
+                                    listState.animateScrollToItem(it - index)
+                                    isManualScrolling = true
+                                }
+                            },
                         style = if (isSelected) configuration.selectedTextStyle else configuration.unselectedTextStyle
                     )
                 }

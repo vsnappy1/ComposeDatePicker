@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Column() {
                         Calendar(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(16.dp).background(Color.Cyan),
                             onDateSelected = {year, month, day ->
 //                                Toast.makeText(this@MainActivity, "$month/$day/$year", Toast.LENGTH_SHORT).show()
                             },
