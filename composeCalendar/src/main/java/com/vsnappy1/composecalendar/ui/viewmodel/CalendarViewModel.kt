@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vsnappy1.composecalendar.data.Constant
 import com.vsnappy1.composecalendar.ui.model.CalendarUiState
-import com.vsnappy1.composecalendar.ui.model.Date
+import com.vsnappy1.composecalendar.data.model.ComposeCalendarDate
 
 class CalendarViewModel : ViewModel() {
 
@@ -78,7 +78,7 @@ class CalendarViewModel : ViewModel() {
         )
     }
 
-    fun setDate(date: Date) {
+    fun setDate(date: ComposeCalendarDate) {
         val yearMin = Constant.years.first()
         val yearMax = Constant.years.last()
 

@@ -1,7 +1,7 @@
 package com.vsnappy1.composecalendar.ui.model
 
 import com.vsnappy1.composecalendar.data.Constant
-import com.vsnappy1.composecalendar.enums.Month
+import com.vsnappy1.composecalendar.data.model.Month
 import java.util.Calendar
 
 data class CalendarUiState(

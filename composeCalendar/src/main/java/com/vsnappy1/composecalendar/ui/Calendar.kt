@@ -1,6 +1,5 @@
 package com.vsnappy1.composecalendar.ui
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.animateFloatAsState
@@ -20,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -51,14 +51,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vsnappy1.composecalendar.R
 import com.vsnappy1.composecalendar.data.Constant
-import com.vsnappy1.composecalendar.enums.Month
+import com.vsnappy1.composecalendar.enums.Days
+import com.vsnappy1.composecalendar.data.model.Month
 import com.vsnappy1.composecalendar.extension.noRippleClickable
 import com.vsnappy1.composecalendar.theme.Size.medium
 import com.vsnappy1.composecalendar.theme.Size.small
 import com.vsnappy1.composecalendar.ui.model.CalendarUiState
-import com.vsnappy1.composecalendar.ui.model.Date
+import com.vsnappy1.composecalendar.data.model.ComposeCalendarDate
 import com.vsnappy1.composecalendar.ui.model.DateViewConfiguration
-import com.vsnappy1.composecalendar.ui.model.DefaultDate
+import com.vsnappy1.composecalendar.data.model.DefaultDate
 import com.vsnappy1.composecalendar.ui.model.HeaderConfiguration
 import com.vsnappy1.composecalendar.ui.model.MonthYearViewConfiguration
 import com.vsnappy1.composecalendar.ui.viewmodel.CalendarViewModel
@@ -70,8 +71,8 @@ import kotlin.streams.toList
 @Composable
 fun Calendar(
     modifier: Modifier = Modifier,
-    onDateSelected: (Int, Int, Int) -> Unit = { year: Int, month: Int, day: Int -> },
-    date: Date = DefaultDate.defaultDate,
+    onDateSelected: (Int, Int, Int) -> Unit = { _: Int, _: Int, _: Int -> },
+    date: ComposeCalendarDate = DefaultDate.defaultDate,
     headerConfiguration: HeaderConfiguration = HeaderConfiguration(),
     dateViewConfiguration: DateViewConfiguration = DateViewConfiguration(),
     monthYearViewConfiguration: MonthYearViewConfiguration = MonthYearViewConfiguration(),
@@ -131,7 +132,6 @@ fun Calendar(
                     modifier = Modifier.align(Alignment.Center),
                     selectedMonth = uiState.currentVisibleMonth.number,
                     onMonthChange = { viewModel.updateCurrentVisibleMonth(it) },
-                    months = uiState.availableMonths.stream().map { it.name }.toList(),
                     selectedYear = uiState.selectedYearIndex,
                     onYearChange = { viewModel.updateSelectedYearIndex(it) },
                     years = uiState.availableYears.stream().map { it.toString() }.toList(),
@@ -145,7 +145,7 @@ fun Calendar(
 @Composable
 fun AnimatedFadeVisibility(
     visible: Boolean,
-    content: @Composable() AnimatedVisibilityScope.() -> Unit
+    content: @Composable AnimatedVisibilityScope.() -> Unit
 ) {
     AnimatedVisibility(
         visible = visible,
@@ -161,7 +161,6 @@ private fun MonthAndYearView(
     modifier: Modifier = Modifier,
     selectedMonth: Int,
     onMonthChange: (Int) -> Unit,
-    months: List<String>,
     selectedYear: Int,
     onYearChange: (Int) -> Unit,
     years: List<String>,
@@ -194,7 +193,7 @@ private fun MonthAndYearView(
             SwipeLazyColumn(
                 selectedIndex = selectedMonth,
                 onSelectedIndexChange = onMonthChange,
-                items = months,
+                items = Constant.months,
                 configuration = configuration
             )
             SwipeLazyColumn(
@@ -206,7 +205,6 @@ private fun MonthAndYearView(
             )
         }
     }
-
 }
 
 @Composable
@@ -228,7 +226,7 @@ private fun SwipeLazyColumn(
 
     if (isManualScrolling) { // Because I don't want this to interfere when item is clicked and scrolling starts
         LaunchedEffect(key1 = listState.firstVisibleItemScrollOffset) {
-            onSelectedIndexChange(listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > configuration.height.value / configuration.numberOfRowsDisplayed + 20) 1 else 0)
+            onSelectedIndexChange(listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > configuration.height.value / configuration.numberOfRowsDisplayed) 1 else 0)
             listState.animateScrollToItem(selectedIndex)
         }
     }
@@ -240,33 +238,82 @@ private fun SwipeLazyColumn(
         state = listState
     ) {
         items(items.size + configuration.numberOfRowsDisplayed - 1) {
-            val index = configuration.numberOfRowsDisplayed / 2
-            val isSelected = it == selectedIndex + index
-            val scale by animateFloatAsState(targetValue = if (isSelected) configuration.scaleFactor else 1f)
-            Box(
-                modifier = Modifier
-                    .height(configuration.height / configuration.numberOfRowsDisplayed)
-                    .width(configuration.width)
-            ) {
-                if (it >= index && it < items.size + index) {
-                    Text(
-                        text = items[it - index],
-                        modifier = Modifier
-                            .align(alignment)
-                            .scale(scale)
-                            .noRippleClickable {
-                                Log.d("--TAG", "SwipeLazyColumn: $it")
-                                onSelectedIndexChange(it - index)
-                                coroutineScope.launch {
-                                    isManualScrolling = false
-                                    listState.animateScrollToItem(it - index)
-                                    isManualScrolling = true
-                                }
-                            },
-                        style = if (isSelected) configuration.selectedTextStyle else configuration.unselectedTextStyle
-                    )
+            SliderItem(
+                value = it,
+                selectedIndex = selectedIndex,
+                items = items,
+                configuration = configuration,
+                alignment = alignment,
+                onItemClick = { index ->
+                    onSelectedIndexChange(index)
+                    coroutineScope.launch {
+                        isManualScrolling = false
+                        listState.animateScrollToItem(index)
+                        isManualScrolling = true
+                    }
                 }
-            }
+            )
+        }
+    }
+}
+
+@Composable
+private fun HorizontalSlider(
+    modifier: Modifier = Modifier,
+    selectedIndex: Int,
+    onSelectedIndexChange: (Int) -> Unit,
+    content: LazyListScope.() -> Unit
+) {
+    var isManualScrolling by remember { mutableStateOf(true) }
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(key1 = Unit) {
+        listState.scrollToItem(selectedIndex)
+    }
+
+    if (isManualScrolling) { // Because I don't want this to interfere when item is clicked and scrolling starts
+        LaunchedEffect(key1 = listState.firstVisibleItemScrollOffset) {
+            onSelectedIndexChange(listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > 50) 1 else 0)
+            listState.animateScrollToItem(selectedIndex)
+        }
+    }
+
+    LazyColumn(
+        modifier = modifier.fillMaxWidth(),
+        state = listState
+    ) {
+        content()
+    }
+}
+
+@Composable
+private fun SliderItem(
+    value: Int,
+    selectedIndex: Int,
+    items: List<String>,
+    onItemClick: (Int) -> Unit,
+    alignment: Alignment,
+    configuration: MonthYearViewConfiguration,
+) {
+    val gap = configuration.numberOfRowsDisplayed / 2
+    val isSelected = value == selectedIndex + gap
+    val scale by animateFloatAsState(targetValue = if (isSelected) configuration.scaleFactor else 1f)
+    Box(
+        modifier = Modifier
+            .height(configuration.height / configuration.numberOfRowsDisplayed)
+            .width(configuration.width)
+    ) {
+        if (value >= gap && value < items.size + gap) {
+            Text(
+                text = items[value - gap],
+                modifier = Modifier
+                    .align(alignment)
+                    .scale(scale)
+                    .noRippleClickable {
+                        onItemClick(value - gap)
+                    },
+                style = if (isSelected) configuration.selectedTextStyle else configuration.unselectedTextStyle
+            )
         }
     }
 }
@@ -290,18 +337,7 @@ private fun DateView(
         )
     ) {
         items(Constant.days) {
-            Box(
-                contentAlignment = Alignment.Center, modifier = Modifier
-                    .size(configuration.selectedDateBackgroundSize)
-            ) {
-                Text(
-                    text = it.abbreviation,
-                    textAlign = TextAlign.Center,
-                    style = configuration.headerTextStyle.copy(
-                        color = if (it.number == 1) configuration.sundayTextColor else configuration.headerTextStyle.color
-                    ),
-                )
-            }
+            DateViewHeaderItem(day = it, configuration = configuration)
         }
         val count =
             currentVisibleMonth.numberOfDays + currentVisibleMonth.firstDayOfMonth.number - 1
@@ -309,29 +345,69 @@ private fun DateView(
             getTopPaddingForItem(count, configuration.selectedDateBackgroundSize)
         items(count) {
             if (it < currentVisibleMonth.firstDayOfMonth.number - 1) return@items // to create empty boxes
-            Box(
-                contentAlignment = Alignment.Center
-            ) {
-                val day = it - currentVisibleMonth.firstDayOfMonth.number + 2
-                val isSelected = day == selectedDayOfMonth && selectedMonth == currentVisibleMonth
-                Box(
-                    contentAlignment = Alignment.Center, modifier = Modifier
-                        .padding(top = if (it < 7) 0.dp else topPaddingForItem) // I don't want first row to have any padding
-                        .size(configuration.selectedDateBackgroundSize)
-                        .clip(configuration.selectedDateBackgroundShape)
-                        .clickable { onDaySelected(day) }
-                        .background(if (isSelected) configuration.selectedDateBackgroundColor else Color.Transparent)
-                ) {
-                    Text(
-                        text = "$day",
-                        textAlign = TextAlign.Center,
-                        style = if (isSelected) configuration.selectedDateStyle else configuration.unselectedDateStyle.copy(
-                            color = if (it % 7 == 0) configuration.sundayTextColor else configuration.unselectedDateStyle.color
-                        ),
-                    )
-                }
-            }
+            DateViewBodyItem(
+                value = it,
+                currentVisibleMonth = currentVisibleMonth,
+                selectedMonth = selectedMonth,
+                selectedDayOfMonth = selectedDayOfMonth,
+                onDaySelected = onDaySelected,
+                topPaddingForItem = topPaddingForItem,
+                configuration = configuration,
+            )
         }
+    }
+}
+
+@Composable
+private fun DateViewBodyItem(
+    value: Int,
+    currentVisibleMonth: Month,
+    selectedMonth: Month,
+    selectedDayOfMonth: Int?,
+    onDaySelected: (Int) -> Unit,
+    topPaddingForItem: Dp,
+    configuration: DateViewConfiguration,
+) {
+    Box(
+        contentAlignment = Alignment.Center
+    ) {
+        val day = value - currentVisibleMonth.firstDayOfMonth.number + 2
+        val isSelected = day == selectedDayOfMonth && selectedMonth == currentVisibleMonth
+        Box(
+            contentAlignment = Alignment.Center, modifier = Modifier
+                .padding(top = if (value < 7) 0.dp else topPaddingForItem) // I don't want first row to have any padding
+                .size(configuration.selectedDateBackgroundSize)
+                .clip(configuration.selectedDateBackgroundShape)
+                .clickable { onDaySelected(day) }
+                .background(if (isSelected) configuration.selectedDateBackgroundColor else Color.Transparent)
+        ) {
+            Text(
+                text = "$day",
+                textAlign = TextAlign.Center,
+                style = if (isSelected) configuration.selectedDateStyle else configuration.unselectedDateStyle.copy(
+                    color = if (value % 7 == 0) configuration.sundayTextColor else configuration.unselectedDateStyle.color
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun DateViewHeaderItem(
+    configuration: DateViewConfiguration,
+    day: Days
+) {
+    Box(
+        contentAlignment = Alignment.Center, modifier = Modifier
+            .size(configuration.selectedDateBackgroundSize)
+    ) {
+        Text(
+            text = day.abbreviation,
+            textAlign = TextAlign.Center,
+            style = configuration.headerTextStyle.copy(
+                color = if (day.number == 1) configuration.sundayTextColor else configuration.headerTextStyle.color
+            ),
+        )
     }
 }
 

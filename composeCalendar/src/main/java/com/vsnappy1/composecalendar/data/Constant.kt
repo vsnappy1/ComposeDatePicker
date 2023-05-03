@@ -8,7 +8,7 @@ import com.vsnappy1.composecalendar.enums.Days.SUNDAY
 import com.vsnappy1.composecalendar.enums.Days.THURSDAY
 import com.vsnappy1.composecalendar.enums.Days.TUESDAY
 import com.vsnappy1.composecalendar.enums.Days.WEDNESDAY
-import com.vsnappy1.composecalendar.enums.Month
+import com.vsnappy1.composecalendar.data.model.Month
 import com.vsnappy1.composecalendar.extension.isLeapYear
 import java.util.Calendar
 
@@ -21,6 +21,21 @@ object Constant {
         THURSDAY,
         FRIDAY,
         SATURDAY
+    )
+
+    val months = listOf(
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
     )
 
     fun getMonths(year: Int): List<Month> {
