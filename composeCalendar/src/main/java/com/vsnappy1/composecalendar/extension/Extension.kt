@@ -9,8 +9,6 @@ import androidx.compose.ui.composed
 
 // TODO refactor code to make it more readable
 // TODO add sliding effect when next or previous arrow is pressed
-// TODO infinite scrolling for months
-// TODO fix the glitch when month toggles very quickly
 // TODO Develop Time Picker
 
 fun Int.isLeapYear(): Boolean {

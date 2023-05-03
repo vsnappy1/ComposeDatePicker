@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -19,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -51,18 +51,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vsnappy1.composecalendar.R
 import com.vsnappy1.composecalendar.data.Constant
-import com.vsnappy1.composecalendar.enums.Days
+import com.vsnappy1.composecalendar.data.model.ComposeCalendarDate
+import com.vsnappy1.composecalendar.data.model.DefaultDate
 import com.vsnappy1.composecalendar.data.model.Month
+import com.vsnappy1.composecalendar.enums.Days
 import com.vsnappy1.composecalendar.extension.noRippleClickable
 import com.vsnappy1.composecalendar.theme.Size.medium
 import com.vsnappy1.composecalendar.theme.Size.small
 import com.vsnappy1.composecalendar.ui.model.CalendarUiState
-import com.vsnappy1.composecalendar.data.model.ComposeCalendarDate
 import com.vsnappy1.composecalendar.ui.model.DateViewConfiguration
-import com.vsnappy1.composecalendar.data.model.DefaultDate
 import com.vsnappy1.composecalendar.ui.model.HeaderConfiguration
 import com.vsnappy1.composecalendar.ui.model.MonthYearViewConfiguration
 import com.vsnappy1.composecalendar.ui.viewmodel.CalendarViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 import kotlin.streams.toList
@@ -130,8 +131,8 @@ fun Calendar(
             ) {
                 MonthAndYearView(
                     modifier = Modifier.align(Alignment.Center),
-                    selectedMonth = uiState.currentVisibleMonth.number,
-                    onMonthChange = { viewModel.updateCurrentVisibleMonth(it) },
+                    selectedMonth = uiState.selectedMonthIndex,
+                    onMonthChange = { viewModel.updateSelectedMonthIndex(it) },
                     selectedYear = uiState.selectedYearIndex,
                     onYearChange = { viewModel.updateSelectedYearIndex(it) },
                     years = uiState.availableYears.stream().map { it.toString() }.toList(),
@@ -217,6 +218,7 @@ private fun SwipeLazyColumn(
     configuration: MonthYearViewConfiguration
 ) {
     val coroutineScope = rememberCoroutineScope()
+    var dragStarted by remember { mutableStateOf(false) }
     var isManualScrolling by remember { mutableStateOf(true) }
     val listState = rememberLazyListState()
 
@@ -224,10 +226,23 @@ private fun SwipeLazyColumn(
         listState.scrollToItem(selectedIndex)
     }
 
-    if (isManualScrolling) { // Because I don't want this to interfere when item is clicked and scrolling starts
+    if (isManualScrolling) {
         LaunchedEffect(key1 = listState.firstVisibleItemScrollOffset) {
             onSelectedIndexChange(listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > configuration.height.value / configuration.numberOfRowsDisplayed) 1 else 0)
+        }
+        LaunchedEffect(key1 = dragStarted) {
             listState.animateScrollToItem(selectedIndex)
+        }
+
+        LaunchedEffect(key1 = Unit) {
+            listState.interactionSource.interactions.collect {
+                if (it is DragInteraction.Stop) {
+                    delay(100)
+                    dragStarted = false
+                } else if (it is DragInteraction.Start) {
+                    dragStarted = true
+                }
+            }
         }
     }
 
@@ -245,44 +260,15 @@ private fun SwipeLazyColumn(
                 configuration = configuration,
                 alignment = alignment,
                 onItemClick = { index ->
-                    onSelectedIndexChange(index)
                     coroutineScope.launch {
                         isManualScrolling = false
+                        onSelectedIndexChange(index)
                         listState.animateScrollToItem(index)
                         isManualScrolling = true
                     }
                 }
             )
         }
-    }
-}
-
-@Composable
-private fun HorizontalSlider(
-    modifier: Modifier = Modifier,
-    selectedIndex: Int,
-    onSelectedIndexChange: (Int) -> Unit,
-    content: LazyListScope.() -> Unit
-) {
-    var isManualScrolling by remember { mutableStateOf(true) }
-    val listState = rememberLazyListState()
-
-    LaunchedEffect(key1 = Unit) {
-        listState.scrollToItem(selectedIndex)
-    }
-
-    if (isManualScrolling) { // Because I don't want this to interfere when item is clicked and scrolling starts
-        LaunchedEffect(key1 = listState.firstVisibleItemScrollOffset) {
-            onSelectedIndexChange(listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > 50) 1 else 0)
-            listState.animateScrollToItem(selectedIndex)
-        }
-    }
-
-    LazyColumn(
-        modifier = modifier.fillMaxWidth(),
-        state = listState
-    ) {
-        content()
     }
 }
 
@@ -304,16 +290,19 @@ private fun SliderItem(
             .width(configuration.width)
     ) {
         if (value >= gap && value < items.size + gap) {
-            Text(
-                text = items[value - gap],
-                modifier = Modifier
-                    .align(alignment)
-                    .scale(scale)
-                    .noRippleClickable {
-                        onItemClick(value - gap)
-                    },
-                style = if (isSelected) configuration.selectedTextStyle else configuration.unselectedTextStyle
-            )
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .noRippleClickable {
+                    onItemClick(value - gap)
+                }) {
+                Text(
+                    text = items[value - gap],
+                    modifier = Modifier
+                        .align(alignment)
+                        .scale(scale),
+                    style = if (isSelected) configuration.selectedTextStyle else configuration.unselectedTextStyle
+                )
+            }
         }
     }
 }

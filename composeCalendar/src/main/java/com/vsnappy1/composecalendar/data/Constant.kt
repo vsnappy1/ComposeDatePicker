@@ -23,7 +23,7 @@ object Constant {
         SATURDAY
     )
 
-    val months = listOf(
+    private val _months = listOf(
         "January",
         "February",
         "March",
@@ -37,6 +37,8 @@ object Constant {
         "November",
         "December",
     )
+
+    val months = listOf(_months, _months, _months, _months, _months, _months, _months).flatten()
 
     fun getMonths(year: Int): List<Month> {
         return listOf(
