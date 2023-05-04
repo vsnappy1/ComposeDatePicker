@@ -1,5 +1,6 @@
 package com.vsnappy1.composecalendar.ui
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.animateFloatAsState
@@ -8,9 +9,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,9 +23,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -43,10 +48,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vsnappy1.composecalendar.R
@@ -56,6 +64,7 @@ import com.vsnappy1.composecalendar.data.model.DefaultDate
 import com.vsnappy1.composecalendar.data.model.Month
 import com.vsnappy1.composecalendar.enums.Days
 import com.vsnappy1.composecalendar.extension.noRippleClickable
+import com.vsnappy1.composecalendar.extension.toDp
 import com.vsnappy1.composecalendar.theme.Size.medium
 import com.vsnappy1.composecalendar.theme.Size.small
 import com.vsnappy1.composecalendar.ui.model.CalendarUiState
@@ -91,6 +100,11 @@ fun Calendar(
             selectedDayOfMonth = date.day
         )
     )
+
+    Log.d(
+        "-TAG",
+        "Calendar: ${uiState.previousVisibleMonth.name} ${uiState.currentVisibleMonth.name} ${uiState.nextVisibleMonth.name} "
+    )
     Box(modifier = modifier) {
         CalendarHeader(
             title = "${uiState.currentVisibleMonth.name} ${uiState.selectedYear}",
@@ -110,7 +124,11 @@ fun Calendar(
                 visible = !uiState.isMonthYearViewVisible
             ) {
                 DateView(
-                    currentVisibleMonth = uiState.currentVisibleMonth,
+                    currentVisibleMonth = listOf(
+                        uiState.previousVisibleMonth,
+                        uiState.currentVisibleMonth,
+                        uiState.nextVisibleMonth
+                    ),
                     selectedMonth = uiState.selectedMonth,
                     selectedDayOfMonth = uiState.selectedDayOfMonth,
                     onDaySelected = {
@@ -311,38 +329,66 @@ private fun SliderItem(
 @Composable
 private fun DateView(
     modifier: Modifier = Modifier,
-    currentVisibleMonth: Month,
+    currentVisibleMonth: List<Month>,
     selectedDayOfMonth: Int?,
     onDaySelected: (Int) -> Unit,
     selectedMonth: Month,
     configuration: DateViewConfiguration
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(7),
-        userScrollEnabled = false,
-        modifier = modifier.background(
-            color = configuration.backgroundColor,
-            shape = configuration.backgroundShape
-        )
-    ) {
-        items(Constant.days) {
-            DateViewHeaderItem(day = it, configuration = configuration)
+    Column {
+        var size by remember { mutableStateOf(IntSize.Zero) }
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(7),
+            userScrollEnabled = false,
+            modifier = modifier
+                .background(
+                    color = configuration.backgroundColor,
+                    shape = configuration.backgroundShape
+                )
+                .onGloballyPositioned { coordinates -> size = coordinates.size }
+        ) {
+            items(Constant.days) {
+                DateViewHeaderItem(day = it, configuration = configuration)
+            }
         }
-        val count =
-            currentVisibleMonth.numberOfDays + currentVisibleMonth.firstDayOfMonth.number - 1
-        val topPaddingForItem =
-            getTopPaddingForItem(count, configuration.selectedDateBackgroundSize)
-        items(count) {
-            if (it < currentVisibleMonth.firstDayOfMonth.number - 1) return@items // to create empty boxes
-            DateViewBodyItem(
-                value = it,
-                currentVisibleMonth = currentVisibleMonth,
-                selectedMonth = selectedMonth,
-                selectedDayOfMonth = selectedDayOfMonth,
-                onDaySelected = onDaySelected,
-                topPaddingForItem = topPaddingForItem,
-                configuration = configuration,
-            )
+        val context = LocalContext.current
+        val listState = rememberLazyListState()
+        LaunchedEffect(key1 = Unit){
+            listState.scrollToItem(1)
+        }
+        LazyRow(
+            state = listState
+        ) {
+            items(currentVisibleMonth) { currentVisibleMonth ->
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(7),
+                    userScrollEnabled = false,
+                    modifier = modifier
+                        .background(
+                            color = configuration.backgroundColor,
+                            shape = configuration.backgroundShape
+                        )
+                        .width(size.width.toDp(context).dp)
+                ) {
+
+                    val count =
+                        currentVisibleMonth.numberOfDays + currentVisibleMonth.firstDayOfMonth.number - 1
+                    val topPaddingForItem =
+                        getTopPaddingForItem(count, configuration.selectedDateBackgroundSize)
+                    items(count) {
+                        if (it < currentVisibleMonth.firstDayOfMonth.number - 1) return@items // to create empty boxes
+                        DateViewBodyItem(
+                            value = it,
+                            currentVisibleMonth = currentVisibleMonth,
+                            selectedMonth = selectedMonth,
+                            selectedDayOfMonth = selectedDayOfMonth,
+                            onDaySelected = onDaySelected,
+                            topPaddingForItem = topPaddingForItem,
+                            configuration = configuration,
+                        )
+                    }
+                }
+            }
         }
     }
 }

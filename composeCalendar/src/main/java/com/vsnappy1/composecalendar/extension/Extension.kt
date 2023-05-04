@@ -1,5 +1,7 @@
 package com.vsnappy1.composecalendar.extension
 
+import android.content.Context
+import android.util.TypedValue
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.remember
@@ -25,4 +27,12 @@ fun Modifier.noRippleClickable(enabled: Boolean = true, onClick: () -> Unit): Mo
     ) {
         onClick()
     }
+}
+
+fun Int.toDp(context: Context): Float {
+    return TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_PX,
+        this.toFloat(),
+        context.resources.displayMetrics
+    ) / context.resources.displayMetrics.density
 }

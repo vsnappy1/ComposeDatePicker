@@ -18,6 +18,12 @@ class CalendarViewModel : ViewModel() {
     init {
         uiState.value?.let {
             availableMonths = Constant.getMonths(it.selectedYear)
+            _uiState.value = _uiState.value?.copy(
+                nextVisibleMonth = if (it.currentVisibleMonth.number + 1 < availableMonths.size) availableMonths[it.currentVisibleMonth.number + 1]
+                else Constant.getMonths(it.selectedYear + 1)[0],
+                previousVisibleMonth = if (it.currentVisibleMonth.number - 1 >= 0) availableMonths[it.currentVisibleMonth.number - 1]
+                else Constant.getMonths(it.selectedYear - 1)[11]
+            )
         }
     }
 
@@ -56,11 +62,16 @@ class CalendarViewModel : ViewModel() {
                 availableMonths = Constant.getMonths(newYear)
                 _uiState.value = _uiState.value?.copy(
                     selectedYear = newYear,
-                    currentVisibleMonth = availableMonths[0]
+                    previousVisibleMonth = Constant.getMonths(selectedYear - 1)[11],
+                    currentVisibleMonth = availableMonths[0],
+                    nextVisibleMonth = availableMonths[1]
                 )
             } else {
                 _uiState.value = _uiState.value?.copy(
-                    currentVisibleMonth = availableMonths[currentVisibleMonth.number + 1]
+                    previousVisibleMonth = availableMonths[currentVisibleMonth.number],
+                    currentVisibleMonth = availableMonths[currentVisibleMonth.number + 1],
+                    nextVisibleMonth = if (currentVisibleMonth.number + 2 < availableMonths.size) availableMonths[currentVisibleMonth.number + 2]
+                    else Constant.getMonths(selectedYear + 1)[0]
                 )
             }
         }
@@ -73,11 +84,16 @@ class CalendarViewModel : ViewModel() {
                 availableMonths = Constant.getMonths(newYear)
                 _uiState.value = _uiState.value?.copy(
                     selectedYear = newYear,
-                    currentVisibleMonth = availableMonths[11]
+                    nextVisibleMonth = Constant.getMonths(selectedYear + 1)[0],
+                    currentVisibleMonth = availableMonths[11],
+                    previousVisibleMonth = availableMonths[10],
                 )
             } else {
                 _uiState.value = _uiState.value?.copy(
-                    currentVisibleMonth = availableMonths[currentVisibleMonth.number - 1]
+                    nextVisibleMonth = availableMonths[currentVisibleMonth.number],
+                    currentVisibleMonth = availableMonths[currentVisibleMonth.number - 1],
+                    previousVisibleMonth = if (currentVisibleMonth.number - 2 >= 0) availableMonths[currentVisibleMonth.number - 2]
+                    else Constant.getMonths(selectedYear - 1)[11]
                 )
             }
         }

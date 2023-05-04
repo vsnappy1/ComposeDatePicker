@@ -10,7 +10,9 @@ data class CalendarUiState(
     val selectedMonth: Month = Constant.getMonths(selectedYear)[Calendar.getInstance()[Calendar.MONTH]],
     val selectedMonthIndex: Int = 36 + selectedMonth.number,
     val currentVisibleMonth: Month = selectedMonth,
+    val previousVisibleMonth: Month = selectedMonth,
+    val nextVisibleMonth: Month = selectedMonth,
     val selectedDayOfMonth: Int? = Calendar.getInstance()[Calendar.DAY_OF_MONTH],
     val availableYears: List<Int> = Constant.years,
-    val isMonthYearViewVisible: Boolean = true
+    val isMonthYearViewVisible: Boolean = false
 )
