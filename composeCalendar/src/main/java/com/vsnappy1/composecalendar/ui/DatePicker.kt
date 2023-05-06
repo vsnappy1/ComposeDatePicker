@@ -1,14 +1,9 @@
 package com.vsnappy1.composecalendar.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.AnimatedVisibilityScope
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -19,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -51,33 +45,34 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vsnappy1.composecalendar.R
 import com.vsnappy1.composecalendar.data.Constant
-import com.vsnappy1.composecalendar.data.model.ComposeCalendarDate
+import com.vsnappy1.composecalendar.data.model.ComposeDatePickerDate
 import com.vsnappy1.composecalendar.data.model.DefaultDate
 import com.vsnappy1.composecalendar.data.model.Month
+import com.vsnappy1.composecalendar.data.model.SelectionLimiter
 import com.vsnappy1.composecalendar.enums.Days
 import com.vsnappy1.composecalendar.extension.noRippleClickable
 import com.vsnappy1.composecalendar.theme.Size.medium
 import com.vsnappy1.composecalendar.theme.Size.small
-import com.vsnappy1.composecalendar.ui.model.CalendarUiState
+import com.vsnappy1.composecalendar.ui.model.DatePickerUiState
 import com.vsnappy1.composecalendar.ui.model.DateViewConfiguration
 import com.vsnappy1.composecalendar.ui.model.HeaderConfiguration
 import com.vsnappy1.composecalendar.ui.model.MonthYearViewConfiguration
-import com.vsnappy1.composecalendar.ui.viewmodel.CalendarViewModel
-import kotlinx.coroutines.delay
+import com.vsnappy1.composecalendar.ui.viewmodel.DatePickerModel
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 import kotlin.streams.toList
 
 
 @Composable
-fun Calendar(
+fun DatePicker(
     modifier: Modifier = Modifier,
     onDateSelected: (Int, Int, Int) -> Unit = { _: Int, _: Int, _: Int -> },
-    date: ComposeCalendarDate = DefaultDate.defaultDate,
+    date: ComposeDatePickerDate = DefaultDate.defaultDate,
+    selectionLimiter: SelectionLimiter = SelectionLimiter(),
     headerConfiguration: HeaderConfiguration = HeaderConfiguration(),
     dateViewConfiguration: DateViewConfiguration = DateViewConfiguration(),
     monthYearViewConfiguration: MonthYearViewConfiguration = MonthYearViewConfiguration(),
-    viewModel: CalendarViewModel = viewModel()
+    viewModel: DatePickerModel = viewModel()
 ) {
     // Key is Unit because I want this to run only once not every time when is composable is recomposed.
     LaunchedEffect(key1 = Unit) {
@@ -85,7 +80,7 @@ fun Calendar(
     }
 
     val uiState by viewModel.uiState.observeAsState(
-        CalendarUiState(
+        DatePickerUiState(
             selectedYear = date.year,
             selectedMonth = Constant.getMonths(date.year)[date.month],
             selectedDayOfMonth = date.day
@@ -107,12 +102,27 @@ fun Calendar(
                 .padding(top = headerConfiguration.height)
         ) {
             AnimatedFadeVisibility(
+                visible = uiState.isMonthYearViewVisible
+            ) {
+                MonthAndYearView(
+                    modifier = Modifier.align(Alignment.Center),
+                    selectedMonth = uiState.selectedMonthIndex,
+                    onMonthChange = { viewModel.updateSelectedMonthIndex(it) },
+                    selectedYear = uiState.selectedYearIndex,
+                    onYearChange = { viewModel.updateSelectedYearIndex(it) },
+                    years = uiState.availableYears.stream().map { it.toString() }.toList(),
+                    configuration = monthYearViewConfiguration.copy(height = dateViewConfiguration.selectedDateBackgroundSize * 7)
+                )
+            }
+            AnimatedFadeVisibility(
                 visible = !uiState.isMonthYearViewVisible
             ) {
                 DateView(
                     currentVisibleMonth = uiState.currentVisibleMonth,
+                    selectedYear = uiState.selectedYear,
                     selectedMonth = uiState.selectedMonth,
                     selectedDayOfMonth = uiState.selectedDayOfMonth,
+                    selectionLimiter = selectionLimiter,
                     onDaySelected = {
                         viewModel.updateSelectedDayAndMonth(it)
                         uiState.selectedDayOfMonth?.let { day ->
@@ -126,34 +136,7 @@ fun Calendar(
                     configuration = dateViewConfiguration
                 )
             }
-            AnimatedFadeVisibility(
-                visible = uiState.isMonthYearViewVisible
-            ) {
-                MonthAndYearView(
-                    modifier = Modifier.align(Alignment.Center),
-                    selectedMonth = uiState.selectedMonthIndex,
-                    onMonthChange = { viewModel.updateSelectedMonthIndex(it) },
-                    selectedYear = uiState.selectedYearIndex,
-                    onYearChange = { viewModel.updateSelectedYearIndex(it) },
-                    years = uiState.availableYears.stream().map { it.toString() }.toList(),
-                    configuration = monthYearViewConfiguration.copy(height = dateViewConfiguration.selectedDateBackgroundSize * 7)
-                )
-            }
         }
-    }
-}
-
-@Composable
-fun AnimatedFadeVisibility(
-    visible: Boolean,
-    content: @Composable AnimatedVisibilityScope.() -> Unit
-) {
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(animationSpec = tween(durationMillis = 500)),
-        exit = fadeOut(animationSpec = tween(durationMillis = 500))
-    ) {
-        content()
     }
 }
 
@@ -208,6 +191,7 @@ private fun MonthAndYearView(
     }
 }
 
+@SuppressLint("FrequentlyChangedStateReadInComposition")
 @Composable
 private fun SwipeLazyColumn(
     modifier: Modifier = Modifier,
@@ -218,39 +202,16 @@ private fun SwipeLazyColumn(
     configuration: MonthYearViewConfiguration
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var dragStarted by remember { mutableStateOf(false) }
     var isManualScrolling by remember { mutableStateOf(true) }
     val listState = rememberLazyListState()
-
-    LaunchedEffect(key1 = Unit) {
-        listState.scrollToItem(selectedIndex)
-    }
-
-    if (isManualScrolling) {
-        LaunchedEffect(key1 = listState.firstVisibleItemScrollOffset) {
-            onSelectedIndexChange(listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > configuration.height.value / configuration.numberOfRowsDisplayed) 1 else 0)
-        }
-        LaunchedEffect(key1 = dragStarted) {
-            listState.animateScrollToItem(selectedIndex)
-        }
-
-        LaunchedEffect(key1 = Unit) {
-            listState.interactionSource.interactions.collect {
-                if (it is DragInteraction.Stop) {
-                    delay(100)
-                    dragStarted = false
-                } else if (it is DragInteraction.Start) {
-                    dragStarted = true
-                }
-            }
-        }
-    }
-
-    LazyColumn(
-        modifier = modifier
-            .height(configuration.height)
-            .width(configuration.width),
-        state = listState
+    SwipeLazyColumn(
+        modifier = modifier,
+        selectedIndex = selectedIndex,
+        onSelectedIndexChange = onSelectedIndexChange,
+        isManualScrolling = isManualScrolling,
+        height = configuration.height,
+        numberOfRowsDisplayed = configuration.numberOfRowsDisplayed,
+        listState = listState
     ) {
         items(items.size + configuration.numberOfRowsDisplayed - 1) {
             SliderItem(
@@ -260,6 +221,7 @@ private fun SwipeLazyColumn(
                 configuration = configuration,
                 alignment = alignment,
                 onItemClick = { index ->
+                    onSelectedIndexChange(index)
                     coroutineScope.launch {
                         isManualScrolling = false
                         onSelectedIndexChange(index)
@@ -311,8 +273,10 @@ private fun SliderItem(
 @Composable
 private fun DateView(
     modifier: Modifier = Modifier,
+    selectedYear: Int,
     currentVisibleMonth: Month,
     selectedDayOfMonth: Int?,
+    selectionLimiter: SelectionLimiter,
     onDaySelected: (Int) -> Unit,
     selectedMonth: Month,
     configuration: DateViewConfiguration
@@ -337,8 +301,10 @@ private fun DateView(
             DateViewBodyItem(
                 value = it,
                 currentVisibleMonth = currentVisibleMonth,
+                selectedYear = selectedYear,
                 selectedMonth = selectedMonth,
                 selectedDayOfMonth = selectedDayOfMonth,
+                selectionLimiter = selectionLimiter,
                 onDaySelected = onDaySelected,
                 topPaddingForItem = topPaddingForItem,
                 configuration = configuration,
@@ -351,8 +317,10 @@ private fun DateView(
 private fun DateViewBodyItem(
     value: Int,
     currentVisibleMonth: Month,
+    selectedYear: Int,
     selectedMonth: Month,
     selectedDayOfMonth: Int?,
+    selectionLimiter: SelectionLimiter,
     onDaySelected: (Int) -> Unit,
     topPaddingForItem: Dp,
     configuration: DateViewConfiguration,
@@ -362,19 +330,32 @@ private fun DateViewBodyItem(
     ) {
         val day = value - currentVisibleMonth.firstDayOfMonth.number + 2
         val isSelected = day == selectedDayOfMonth && selectedMonth == currentVisibleMonth
+        val isWithinRange = selectionLimiter.isWithinRange(
+            ComposeDatePickerDate(
+                selectedYear,
+                currentVisibleMonth.number,
+                day
+            )
+        )
         Box(
             contentAlignment = Alignment.Center, modifier = Modifier
                 .padding(top = if (value < 7) 0.dp else topPaddingForItem) // I don't want first row to have any padding
                 .size(configuration.selectedDateBackgroundSize)
                 .clip(configuration.selectedDateBackgroundShape)
-                .clickable { onDaySelected(day) }
+                .clickable(enabled = isWithinRange) { onDaySelected(day) }
                 .background(if (isSelected) configuration.selectedDateBackgroundColor else Color.Transparent)
         ) {
             Text(
                 text = "$day",
                 textAlign = TextAlign.Center,
-                style = if (isSelected) configuration.selectedDateStyle else configuration.unselectedDateStyle.copy(
-                    color = if (value % 7 == 0) configuration.sundayTextColor else configuration.unselectedDateStyle.color
+                style = if (isSelected) configuration.selectedDateStyle.copy(color = if (isWithinRange) configuration.selectedDateStyle.color else configuration.disabledDateColor)
+                else configuration.unselectedDateStyle.copy(
+                    color = if (isWithinRange) {
+                        if (value % 7 == 0) configuration.sundayTextColor
+                        else configuration.unselectedDateStyle.color
+                    } else {
+                        configuration.disabledDateColor
+                    }
                 ),
             )
         }
@@ -400,6 +381,7 @@ private fun DateViewHeaderItem(
     }
 }
 
+// Not every month has same number of weeks, so to maintain the same size for calender we add padding if there are less weeks
 private fun getTopPaddingForItem(
     count: Int,
     itemSize: Dp
@@ -467,5 +449,5 @@ private fun CalendarHeader(
 @Preview
 @Composable
 fun DefaultCalendar() {
-    Calendar()
+    DatePicker()
 }

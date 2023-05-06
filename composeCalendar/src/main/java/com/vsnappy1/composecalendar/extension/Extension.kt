@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import java.util.Calendar
 
 
 // TODO refactor code to make it more readable
@@ -25,4 +26,13 @@ fun Modifier.noRippleClickable(enabled: Boolean = true, onClick: () -> Unit): Mo
     ) {
         onClick()
     }
+}
+
+fun Calendar.isEqual(calendar: Calendar?): Boolean {
+    calendar?.let {
+        return get(Calendar.YEAR) == it.get(Calendar.YEAR) &&
+                get(Calendar.MONTH) == it.get(Calendar.MONTH) &&
+                get(Calendar.DAY_OF_MONTH) == it.get(Calendar.DAY_OF_MONTH);
+    }
+    return false
 }

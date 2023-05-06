@@ -4,7 +4,7 @@ import com.vsnappy1.composecalendar.data.Constant
 import com.vsnappy1.composecalendar.data.model.Month
 import java.util.Calendar
 
-data class CalendarUiState(
+data class DatePickerUiState(
     val selectedYear: Int = Calendar.getInstance()[Calendar.YEAR],
     val selectedYearIndex: Int = Constant.years.size / 2,
     val selectedMonth: Month = Constant.getMonths(selectedYear)[Calendar.getInstance()[Calendar.MONTH]],

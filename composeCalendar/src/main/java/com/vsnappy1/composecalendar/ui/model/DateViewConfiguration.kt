@@ -28,6 +28,7 @@ data class DateViewConfiguration(
         color = Color.White
     ),
     val sundayTextColor: Color = Color.Red,
+    val disabledDateColor: Color = Color.Gray,
     val selectedDateBackgroundShape: Shape = CircleShape,
     val selectedDateBackgroundSize: Dp = 40.dp,
     val selectedDateBackgroundColor: Color = Color.Blue,

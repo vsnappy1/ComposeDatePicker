@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.vsnappy1.composecalendar.ui.Calendar
+import com.vsnappy1.composecalendar.ui.DatePicker
 import com.vsnappy1.composecalendarexample.ui.theme.ComposeCalendarExampleTheme
 
 class MainActivity : ComponentActivity() {
@@ -29,10 +29,15 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column() {
-                        Calendar(
-                            modifier = Modifier.padding(16.dp).background(Color.Cyan),
-                            onDateSelected = {year, month, day ->
-//                                Toast.makeText(this@MainActivity, "$month/$day/$year", Toast.LENGTH_SHORT).show()
+                        DatePicker(
+                            modifier = Modifier
+                                .padding(16.dp),
+                            onDateSelected = { year, month, day ->
+//                                Toast.makeText(
+//                                    this@MainActivity,
+//                                    "$month/$day/$year",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
                             },
 //                        date = ComposeCalendarDate(2005, 8,16)
                         )
@@ -48,6 +53,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     ComposeCalendarExampleTheme {
-        Calendar()
+        DatePicker()
     }
 }

@@ -5,14 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vsnappy1.composecalendar.data.Constant
-import com.vsnappy1.composecalendar.ui.model.CalendarUiState
-import com.vsnappy1.composecalendar.data.model.ComposeCalendarDate
+import com.vsnappy1.composecalendar.ui.model.DatePickerUiState
+import com.vsnappy1.composecalendar.data.model.ComposeDatePickerDate
 import com.vsnappy1.composecalendar.data.model.Month
 
-class CalendarViewModel : ViewModel() {
+class DatePickerModel : ViewModel() {
 
-    private var _uiState = MutableLiveData(CalendarUiState())
-    val uiState: LiveData<CalendarUiState> = _uiState
+    private var _uiState = MutableLiveData(DatePickerUiState())
+    val uiState: LiveData<DatePickerUiState> = _uiState
     private lateinit var availableMonths: List<Month>
 
     init {
@@ -45,7 +45,7 @@ class CalendarViewModel : ViewModel() {
         }
     }
 
-    fun updateUiState(uiState: CalendarUiState) {
+    fun updateUiState(uiState: DatePickerUiState) {
         _uiState.value = uiState
     }
 
@@ -92,7 +92,7 @@ class CalendarViewModel : ViewModel() {
         )
     }
 
-    fun setDate(date: ComposeCalendarDate) {
+    fun setDate(date: ComposeDatePickerDate) {
         val yearMin = Constant.years.first()
         val yearMax = Constant.years.last()
 
