@@ -46,13 +46,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vsnappy1.composecalendar.R
 import com.vsnappy1.composecalendar.data.Constant
 import com.vsnappy1.composecalendar.data.model.ComposeDatePickerDate
-import com.vsnappy1.composecalendar.data.model.DefaultDate
 import com.vsnappy1.composecalendar.data.model.Month
 import com.vsnappy1.composecalendar.data.model.SelectionLimiter
 import com.vsnappy1.composecalendar.enums.Days
 import com.vsnappy1.composecalendar.extension.noRippleClickable
 import com.vsnappy1.composecalendar.theme.Size.medium
 import com.vsnappy1.composecalendar.theme.Size.small
+import com.vsnappy1.composecalendar.ui.component.AnimatedFadeVisibility
 import com.vsnappy1.composecalendar.ui.model.DatePickerUiState
 import com.vsnappy1.composecalendar.ui.model.DateViewConfiguration
 import com.vsnappy1.composecalendar.ui.model.HeaderConfiguration
@@ -67,7 +67,7 @@ import kotlin.streams.toList
 fun DatePicker(
     modifier: Modifier = Modifier,
     onDateSelected: (Int, Int, Int) -> Unit = { _: Int, _: Int, _: Int -> },
-    date: ComposeDatePickerDate = DefaultDate.defaultDate,
+    date: ComposeDatePickerDate = ComposeDatePickerDate(),
     selectionLimiter: SelectionLimiter = SelectionLimiter(),
     headerConfiguration: HeaderConfiguration = HeaderConfiguration(),
     dateViewConfiguration: DateViewConfiguration = DateViewConfiguration(),
@@ -204,7 +204,7 @@ private fun SwipeLazyColumn(
     val coroutineScope = rememberCoroutineScope()
     var isManualScrolling by remember { mutableStateOf(true) }
     val listState = rememberLazyListState()
-    SwipeLazyColumn(
+    com.vsnappy1.composecalendar.ui.component.SwipeLazyColumn(
         modifier = modifier,
         selectedIndex = selectedIndex,
         onSelectedIndexChange = onSelectedIndexChange,
