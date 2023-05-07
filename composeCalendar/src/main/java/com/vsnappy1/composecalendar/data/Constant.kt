@@ -39,6 +39,7 @@ object Constant {
     )
 
     val months = listOf(_months, _months, _months, _months, _months, _months, _months).flatten()
+    val monthMiddleIndex = 36
 
     fun getMonths(year: Int): List<Month> {
         return listOf(

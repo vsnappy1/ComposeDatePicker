@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -59,7 +58,7 @@ import com.vsnappy1.composecalendar.ui.model.DatePickerUiState
 import com.vsnappy1.composecalendar.ui.model.DateViewConfiguration
 import com.vsnappy1.composecalendar.ui.model.HeaderConfiguration
 import com.vsnappy1.composecalendar.ui.model.MonthYearViewConfiguration
-import com.vsnappy1.composecalendar.ui.viewmodel.DatePickerModel
+import com.vsnappy1.composecalendar.ui.viewmodel.DatePickerViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 import kotlin.streams.toList
@@ -74,7 +73,7 @@ fun DatePicker(
     headerConfiguration: HeaderConfiguration = HeaderConfiguration(),
     dateViewConfiguration: DateViewConfiguration = DateViewConfiguration(),
     monthYearViewConfiguration: MonthYearViewConfiguration = MonthYearViewConfiguration(),
-    viewModel: DatePickerModel = viewModel()
+    viewModel: DatePickerViewModel = viewModel()
 ) {
     // Key is Unit because I want this to run only once not every time when is composable is recomposed.
     LaunchedEffect(key1 = Unit) {
@@ -91,7 +90,7 @@ fun DatePicker(
     Box(modifier = modifier) {
         CalendarHeader(
             title = "${uiState.currentVisibleMonth.name} ${uiState.selectedYear}",
-            onMonthYearClick = { viewModel.updateUiState(uiState.copy(isMonthYearViewVisible = !uiState.isMonthYearViewVisible)) },
+            onMonthYearClick = { viewModel.toggleIsMonthYearViewVisible() },
             onNextClick = { viewModel.moveToNextMonth() },
             onPreviousClick = { viewModel.moveToPreviousMonth() },
             isPreviousNextVisible = !uiState.isMonthYearViewVisible,

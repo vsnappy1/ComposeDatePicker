@@ -33,11 +33,11 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier
                                 .padding(16.dp),
                             onDateSelected = { year, month, day ->
-//                                Toast.makeText(
-//                                    this@MainActivity,
-//                                    "$month/$day/$year",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "$month/$day/$year",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             },
 //                        date = ComposeCalendarDate(2005, 8,16)
                         )
