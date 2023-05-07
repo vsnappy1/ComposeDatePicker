@@ -8,6 +8,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vsnappy1.composecalendar.theme.black
 
 data class MonthYearViewConfiguration(
     val backgroundColor: Color = Color.Transparent,
@@ -17,12 +18,12 @@ data class MonthYearViewConfiguration(
     val unselectedTextStyle: TextStyle = TextStyle(
         fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
-        color = Color.Black.copy(alpha = 0.5f)
+        color = black.copy(alpha = 0.5f)
     ),
     val selectedTextStyle: TextStyle = TextStyle(
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
-        color = Color.Black.copy(alpha = 1f)
+        color = black.copy(alpha = 1f)
     ),
     val scaleFactor: Float = 1.2f,
     val numberOfRowsDisplayed: Int = 7

@@ -12,5 +12,5 @@ data class DatePickerUiState(
     val currentVisibleMonth: Month = selectedMonth,
     val selectedDayOfMonth: Int? = Calendar.getInstance()[Calendar.DAY_OF_MONTH],
     val availableYears: List<Int> = Constant.years,
-    val isMonthYearViewVisible: Boolean = true
+    val isMonthYearViewVisible: Boolean = false
 )

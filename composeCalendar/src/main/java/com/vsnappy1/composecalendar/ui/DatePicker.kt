@@ -1,6 +1,7 @@
 package com.vsnappy1.composecalendar.ui
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -53,6 +54,7 @@ import com.vsnappy1.composecalendar.enums.Days
 import com.vsnappy1.composecalendar.extension.noRippleClickable
 import com.vsnappy1.composecalendar.theme.Size.medium
 import com.vsnappy1.composecalendar.theme.Size.small
+import com.vsnappy1.composecalendar.theme.grayLight
 import com.vsnappy1.composecalendar.ui.model.DatePickerUiState
 import com.vsnappy1.composecalendar.ui.model.DateViewConfiguration
 import com.vsnappy1.composecalendar.ui.model.HeaderConfiguration
@@ -93,7 +95,8 @@ fun DatePicker(
             onNextClick = { viewModel.moveToNextMonth() },
             onPreviousClick = { viewModel.moveToPreviousMonth() },
             isPreviousNextVisible = !uiState.isMonthYearViewVisible,
-            configuration = headerConfiguration
+            configuration = headerConfiguration,
+            themeColor = dateViewConfiguration.selectedDateBackgroundColor
         )
         Spacer(modifier = Modifier.height(small))
         Box(
@@ -101,19 +104,6 @@ fun DatePicker(
                 .height(dateViewConfiguration.selectedDateBackgroundSize * 8f + small)
                 .padding(top = headerConfiguration.height)
         ) {
-            AnimatedFadeVisibility(
-                visible = uiState.isMonthYearViewVisible
-            ) {
-                MonthAndYearView(
-                    modifier = Modifier.align(Alignment.Center),
-                    selectedMonth = uiState.selectedMonthIndex,
-                    onMonthChange = { viewModel.updateSelectedMonthIndex(it) },
-                    selectedYear = uiState.selectedYearIndex,
-                    onYearChange = { viewModel.updateSelectedYearIndex(it) },
-                    years = uiState.availableYears.stream().map { it.toString() }.toList(),
-                    configuration = monthYearViewConfiguration.copy(height = dateViewConfiguration.selectedDateBackgroundSize * 7)
-                )
-            }
             AnimatedFadeVisibility(
                 visible = !uiState.isMonthYearViewVisible
             ) {
@@ -134,6 +124,19 @@ fun DatePicker(
                         }
                     },
                     configuration = dateViewConfiguration
+                )
+            }
+            AnimatedFadeVisibility(
+                visible = uiState.isMonthYearViewVisible
+            ) {
+                MonthAndYearView(
+                    modifier = Modifier.align(Alignment.Center),
+                    selectedMonth = uiState.selectedMonthIndex,
+                    onMonthChange = { viewModel.updateSelectedMonthIndex(it) },
+                    selectedYear = uiState.selectedYearIndex,
+                    onYearChange = { viewModel.updateSelectedYearIndex(it) },
+                    years = uiState.availableYears.stream().map { it.toString() }.toList(),
+                    configuration = monthYearViewConfiguration.copy(height = dateViewConfiguration.selectedDateBackgroundSize * 7)
                 )
             }
         }
@@ -165,8 +168,8 @@ private fun MonthAndYearView(
                 .fillMaxWidth()
                 .height(40.dp)
                 .background(
-                    color = Color.Gray.copy(alpha = 0.3f),
-                    shape = RoundedCornerShape(small)
+                    color = grayLight.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(medium)
                 )
         )
         Row(
@@ -342,7 +345,7 @@ private fun DateViewBodyItem(
                 .padding(top = if (value < 7) 0.dp else topPaddingForItem) // I don't want first row to have any padding
                 .size(configuration.selectedDateBackgroundSize)
                 .clip(configuration.selectedDateBackgroundShape)
-                .clickable(enabled = isWithinRange) { onDaySelected(day) }
+                .noRippleClickable(enabled = isWithinRange) { onDaySelected(day) }
                 .background(if (isSelected) configuration.selectedDateBackgroundColor else Color.Transparent)
         ) {
             Text(
@@ -399,7 +402,8 @@ private fun CalendarHeader(
     onPreviousClick: () -> Unit,
     onMonthYearClick: () -> Unit,
     isPreviousNextVisible: Boolean,
-    configuration: HeaderConfiguration
+    configuration: HeaderConfiguration,
+    themeColor: Color
 ) {
     Box(
         modifier = Modifier
@@ -410,9 +414,11 @@ private fun CalendarHeader(
             .fillMaxWidth()
             .height(configuration.height)
     ) {
+        val textColor by
+        animateColorAsState(targetValue = if (isPreviousNextVisible) configuration.textStyle.color else themeColor)
         Text(
             text = title,
-            style = configuration.textStyle,
+            style = configuration.textStyle.copy(color = textColor),
             modifier = modifier
                 .padding(start = medium)
                 .noRippleClickable { onMonthYearClick() }
