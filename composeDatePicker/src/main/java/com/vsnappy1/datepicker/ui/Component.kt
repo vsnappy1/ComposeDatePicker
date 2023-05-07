@@ -29,7 +29,7 @@ fun AnimatedFadeVisibility(
 ) {
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn(animationSpec = tween(durationMillis = 500)),
+        enter = fadeIn(animationSpec = tween(durationMillis = 400, delayMillis = 100)),
         exit = fadeOut(animationSpec = tween(durationMillis = 250))
     ) {
         content()
