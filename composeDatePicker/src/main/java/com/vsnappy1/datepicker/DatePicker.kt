@@ -62,7 +62,6 @@ import com.vsnappy1.datepicker.ui.model.MonthYearViewConfiguration
 import com.vsnappy1.datepicker.ui.viewmodel.DatePickerViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
-import kotlin.streams.toList
 
 
 @Composable
@@ -76,6 +75,9 @@ fun DatePicker(
     monthYearViewConfiguration: MonthYearViewConfiguration = MonthYearViewConfiguration()
 ) {
     val viewModel: DatePickerViewModel = viewModel()
+
+    // there may be 4 to 6 weeks in a month plus we have header that also makes an row
+    val totalRows = 8f
 
     // Key is Unit because I want this to run only once not every time when is composable is recomposed.
     LaunchedEffect(key1 = Unit) {
@@ -102,7 +104,7 @@ fun DatePicker(
         Spacer(modifier = Modifier.height(small))
         Box(
             modifier = Modifier
-                .height(dateViewConfiguration.selectedDateBackgroundSize * 8f + small)
+                .height(dateViewConfiguration.selectedDateBackgroundSize * totalRows + small)
                 .padding(top = headerConfiguration.height)
         ) {
             AnimatedFadeVisibility(
@@ -116,13 +118,11 @@ fun DatePicker(
                     selectionLimiter = selectionLimiter,
                     onDaySelected = {
                         viewModel.updateSelectedDayAndMonth(it)
-                        uiState.selectedDayOfMonth?.let { day ->
-                            onDateSelected(
-                                uiState.selectedYear,
-                                uiState.selectedMonth.number,
-                                day
-                            )
-                        }
+                        onDateSelected(
+                            uiState.selectedYear,
+                            uiState.selectedMonth.number,
+                            uiState.selectedDayOfMonth
+                        )
                     },
                     configuration = dateViewConfiguration
                 )
@@ -136,7 +136,8 @@ fun DatePicker(
                     onMonthChange = { viewModel.updateSelectedMonthIndex(it) },
                     selectedYear = uiState.selectedYearIndex,
                     onYearChange = { viewModel.updateSelectedYearIndex(it) },
-                    years = uiState.availableYears.stream().map { it.toString() }.toList(),
+                    years = uiState.years,
+                    months = uiState.months,
                     configuration = monthYearViewConfiguration.copy(height = dateViewConfiguration.selectedDateBackgroundSize * 7)
                 )
             }
@@ -152,6 +153,7 @@ private fun MonthAndYearView(
     selectedYear: Int,
     onYearChange: (Int) -> Unit,
     years: List<String>,
+    months: List<String>,
     configuration: MonthYearViewConfiguration
 ) {
     Box(
@@ -181,7 +183,7 @@ private fun MonthAndYearView(
             SwipeLazyColumn(
                 selectedIndex = selectedMonth,
                 onSelectedIndexChange = onMonthChange,
-                items = Constant.months,
+                items = months,
                 configuration = configuration
             )
             SwipeLazyColumn(
@@ -206,18 +208,20 @@ private fun SwipeLazyColumn(
     configuration: MonthYearViewConfiguration
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var isManualScrolling by remember { mutableStateOf(true) }
+    var isAutoScrolling by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     com.vsnappy1.datepicker.ui.SwipeLazyColumn(
         modifier = modifier,
         selectedIndex = selectedIndex,
         onSelectedIndexChange = onSelectedIndexChange,
-        isManualScrolling = isManualScrolling,
+        isAutoScrolling = isAutoScrolling,
         height = configuration.height,
         numberOfRowsDisplayed = configuration.numberOfRowsDisplayed,
         listState = listState
     ) {
-        items(items.size + configuration.numberOfRowsDisplayed - 1) {
+        // we add some empty rows at the beginning and end of list to make it feel that it is a center focused list
+        val count = items.size + configuration.numberOfRowsDisplayed - 1
+        items(count) {
             SliderItem(
                 value = it,
                 selectedIndex = selectedIndex,
@@ -227,10 +231,10 @@ private fun SwipeLazyColumn(
                 onItemClick = { index ->
                     onSelectedIndexChange(index)
                     coroutineScope.launch {
-                        isManualScrolling = false
+                        isAutoScrolling = true
                         onSelectedIndexChange(index)
                         listState.animateScrollToItem(index)
-                        isManualScrolling = true
+                        isAutoScrolling = false
                     }
                 }
             )
@@ -247,6 +251,7 @@ private fun SliderItem(
     alignment: Alignment,
     configuration: MonthYearViewConfiguration,
 ) {
+    // this gap variable helps in maintaining center as selected
     val gap = configuration.numberOfRowsDisplayed / 2
     val isSelected = value == selectedIndex + gap
     val scale by animateFloatAsState(targetValue = if (isSelected) configuration.scaleFactor else 1f)
@@ -296,6 +301,8 @@ private fun DateView(
         items(Constant.days) {
             DateViewHeaderItem(day = it, configuration = configuration)
         }
+        // since we may need few empty cells because every month starts with a different day(Monday, Tuesday, ..)
+        // that's way we add some number X into the count
         val count =
             currentVisibleMonth.numberOfDays + currentVisibleMonth.firstDayOfMonth.number - 1
         val topPaddingForItem =

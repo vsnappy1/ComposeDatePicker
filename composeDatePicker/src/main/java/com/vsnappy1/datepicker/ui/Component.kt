@@ -43,7 +43,7 @@ fun SwipeLazyColumn(
     selectedIndex: Int,
     onSelectedIndexChange: (Int) -> Unit,
     height: Dp,
-    isManualScrolling: Boolean,
+    isAutoScrolling: Boolean,
     numberOfRowsDisplayed: Int,
     listState: LazyListState,
     content: LazyListScope.() -> Unit
@@ -53,7 +53,7 @@ fun SwipeLazyColumn(
     LaunchedEffect(key1 = Unit) {
         listState.scrollToItem(selectedIndex)
     }
-    if(isManualScrolling){
+    if(!isAutoScrolling){
         LaunchedEffect(key1 = listState.firstVisibleItemScrollOffset) {
             onSelectedIndexChange(listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > height.value / numberOfRowsDisplayed) 1 else 0)
         }

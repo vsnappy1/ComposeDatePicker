@@ -18,6 +18,7 @@ class DatePickerViewModel : ViewModel() {
     val uiState: LiveData<DatePickerUiState> = _uiState
     private lateinit var availableMonths: List<Month>
 
+
     init {
         uiState.value?.let {
             availableMonths = Constant.getMonths(it.selectedYear)
@@ -48,18 +49,16 @@ class DatePickerViewModel : ViewModel() {
         }
     }
 
-    fun updateUiState(uiState: DatePickerUiState) {
-        _uiState.value = uiState
-    }
-
     fun moveToNextMonth() {
         _uiState.value?.apply {
-            if (currentVisibleMonth.number == 11) { // if it is december
-                val newYear = selectedYear + 1
-                availableMonths = Constant.getMonths(newYear)
+            if (currentVisibleMonth.number == 11) { // if it is December
+                val nextYearIndex = selectedYearIndex + 1
+                if(nextYearIndex == years.size) return
+                val nextYear = years[nextYearIndex].toInt()
+                availableMonths = Constant.getMonths(nextYear)
                 _uiState.value = _uiState.value?.copy(
-                    selectedYear = newYear,
-                    selectedYearIndex = selectedYearIndex + 1,
+                    selectedYear = nextYear,
+                    selectedYearIndex = nextYearIndex,
                     selectedMonthIndex = getAdjustedSelectedMonthIndex(selectedMonthIndex + 1),
                     currentVisibleMonth = availableMonths[0]
                 )
@@ -74,12 +73,14 @@ class DatePickerViewModel : ViewModel() {
 
     fun moveToPreviousMonth() {
         _uiState.value?.apply {
-            if (currentVisibleMonth.number == 0) { // if it is december
-                val newYear = selectedYear - 1
-                availableMonths = Constant.getMonths(newYear)
+            if (currentVisibleMonth.number == 0) { // if it is January
+                val previousYearIndex = selectedYearIndex - 1
+                if(previousYearIndex == -1) return
+                val previousYear = years[previousYearIndex].toInt()
+                availableMonths = Constant.getMonths(previousYear)
                 _uiState.value = _uiState.value?.copy(
-                    selectedYear = newYear,
-                    selectedYearIndex = selectedYearIndex - 1,
+                    selectedYear = previousYear,
+                    selectedYearIndex = previousYearIndex,
                     selectedMonthIndex = getAdjustedSelectedMonthIndex(selectedMonthIndex - 1),
                     currentVisibleMonth = availableMonths[11]
                 )
@@ -133,8 +134,8 @@ class DatePickerViewModel : ViewModel() {
         }
 
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.YEAR, date.year)
-        calendar.set(Calendar.MONTH, date.month)
+        calendar[Calendar.YEAR] = date.year
+        calendar[Calendar.MONTH] = date.month
 
         val maxDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         if (date.day < 1) {

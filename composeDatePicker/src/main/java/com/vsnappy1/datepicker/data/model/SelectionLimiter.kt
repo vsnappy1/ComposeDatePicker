@@ -8,7 +8,7 @@ class SelectionLimiter(
     private val toDate: ComposeDatePickerDate? = null
 ) {
     fun isWithinRange(date: ComposeDatePickerDate): Boolean {
-        if (fromDate == null && toDate == null) return true
+
 
         val fromDate =
             fromDate?.let {
@@ -27,13 +27,20 @@ class SelectionLimiter(
             set(date.year, date.month, date.day, 0, 0)
         }
 
-        return if (fromDate != null) {
-            selectedDate.after(fromDate) || selectedDate.isEqual(fromDate)
-        } else if (toDate != null) {
-            selectedDate.before(toDate) || selectedDate.isEqual(toDate)
-        } else {
-            (selectedDate.before(toDate) && selectedDate.after(fromDate)) ||
-                    (selectedDate.isEqual(toDate) || selectedDate.isEqual(fromDate))
+        return when {
+            fromDate == null && toDate == null -> {
+                return true
+            }
+            fromDate != null -> {
+                selectedDate.after(fromDate) || selectedDate.isEqual(fromDate)
+            }
+            toDate != null -> {
+                selectedDate.before(toDate) || selectedDate.isEqual(toDate)
+            }
+            else -> {
+                (selectedDate.before(toDate) && selectedDate.after(fromDate)) ||
+                        (selectedDate.isEqual(toDate) || selectedDate.isEqual(fromDate))
+            }
         }
     }
 }

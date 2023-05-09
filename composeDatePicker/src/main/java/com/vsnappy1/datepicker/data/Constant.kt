@@ -23,7 +23,7 @@ object Constant {
         SATURDAY
     )
 
-    private val _months = listOf(
+    private val monthNames = listOf(
         "January",
         "February",
         "March",
@@ -38,8 +38,11 @@ object Constant {
         "December",
     )
 
-    val months = listOf(_months, _months, _months, _months, _months, _months, _months).flatten()
-    const val monthMiddleIndex = 36
+    val months = listOf(
+        monthNames, monthNames, monthNames, monthNames, monthNames, monthNames, monthNames,
+        monthNames, monthNames, monthNames, monthNames, monthNames, monthNames
+    ).flatten()
+    const val monthMiddleIndex = 72
 
     fun getMonths(year: Int): List<Month> {
         return listOf(
@@ -61,8 +64,8 @@ object Constant {
     private fun getFirstDayOfMonth(month: Int, year: Int): Days {
         val calendar = Calendar.getInstance()
         calendar.set(year, month, 1)
-        return Days.get(calendar.get(Calendar.DAY_OF_WEEK))
+        return Days.get(calendar[Calendar.DAY_OF_WEEK])
     }
 
-    val years = List(100) { it + Calendar.getInstance().get(Calendar.YEAR) - 50 }
+    val years = List(200) { it + Calendar.getInstance()[Calendar.YEAR] - 100 }
 }
