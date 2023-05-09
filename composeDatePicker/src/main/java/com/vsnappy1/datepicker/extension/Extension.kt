@@ -7,10 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import java.util.Calendar
 
-
-// TODO add sliding effect when next or previous arrow is pressed
-// TODO Develop Time Picker
-
 fun Int.isLeapYear(): Boolean {
     // A year is a leap year if it is divisible by 4
     // but not divisible by 100, unless it is also divisible by 400

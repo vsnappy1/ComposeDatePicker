@@ -3,6 +3,7 @@ package com.vsnappy1.datepicker
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -92,6 +93,7 @@ fun DatePicker(
         )
     )
     Box(modifier = modifier) {
+        // TODO add sliding effect when next or previous arrow is pressed
         CalendarHeader(
             title = "${uiState.currentVisibleMonth.name} ${uiState.selectedYear}",
             onMonthYearClick = { viewModel.toggleIsMonthYearViewVisible() },
@@ -251,7 +253,7 @@ private fun SliderItem(
     alignment: Alignment,
     configuration: MonthYearViewConfiguration,
 ) {
-    // this gap variable helps in maintaining center as selected
+    // this gap variable helps in maintaining list as center focused list
     val gap = configuration.numberOfRowsDisplayed / 2
     val isSelected = value == selectedIndex + gap
     val scale by animateFloatAsState(targetValue = if (isSelected) configuration.scaleFactor else 1f)
@@ -277,7 +279,6 @@ private fun SliderItem(
         }
     }
 }
-
 
 @Composable
 private fun DateView(
@@ -423,7 +424,10 @@ private fun CalendarHeader(
             .height(configuration.height)
     ) {
         val textColor by
-        animateColorAsState(targetValue = if (isPreviousNextVisible) configuration.textStyle.color else themeColor)
+        animateColorAsState(
+            targetValue = if (isPreviousNextVisible) configuration.textStyle.color else themeColor,
+            animationSpec = tween(durationMillis = 400, delayMillis = 100)
+        )
         Text(
             text = title,
             style = configuration.textStyle.copy(color = textColor),
@@ -462,6 +466,6 @@ private fun CalendarHeader(
 
 @Preview
 @Composable
-fun DefaultCalendar() {
+fun DefaultDatePicker() {
     DatePicker()
 }

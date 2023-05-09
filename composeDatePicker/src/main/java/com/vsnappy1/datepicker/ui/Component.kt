@@ -34,6 +34,7 @@ fun AnimatedFadeVisibility(
     }
 }
 
+//TODO improve scrolling logic so scrolling looks more natural while keeping items clickable.
 @SuppressLint("FrequentlyChangedStateReadInComposition")
 @Composable
 fun SwipeLazyColumn(
@@ -58,7 +59,7 @@ fun SwipeLazyColumn(
                 listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > height.value / numberOfRowsDisplayed) 1 else 0
             onSelectedIndexChange(index)
             count = if (index == lastSelectedIndex) ++count else 0
-            if (count >= 5) {
+            if (count >= 4) {
                 listState.animateScrollToItem(selectedIndex)
             }
             lastSelectedIndex = index

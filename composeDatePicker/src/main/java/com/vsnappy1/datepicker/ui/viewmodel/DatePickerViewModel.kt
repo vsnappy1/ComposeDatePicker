@@ -53,7 +53,7 @@ class DatePickerViewModel : ViewModel() {
         _uiState.value?.apply {
             if (currentVisibleMonth.number == 11) { // if it is December
                 val nextYearIndex = selectedYearIndex + 1
-                if(nextYearIndex == years.size) return
+                if (nextYearIndex == years.size) return
                 val nextYear = years[nextYearIndex].toInt()
                 availableMonths = Constant.getMonths(nextYear)
                 _uiState.value = _uiState.value?.copy(
@@ -75,7 +75,7 @@ class DatePickerViewModel : ViewModel() {
         _uiState.value?.apply {
             if (currentVisibleMonth.number == 0) { // if it is January
                 val previousYearIndex = selectedYearIndex - 1
-                if(previousYearIndex == -1) return
+                if (previousYearIndex == -1) return
                 val previousYear = years[previousYearIndex].toInt()
                 availableMonths = Constant.getMonths(previousYear)
                 _uiState.value = _uiState.value?.copy(
@@ -122,27 +122,33 @@ class DatePickerViewModel : ViewModel() {
         }
     }
 
-    fun setDate(date: ComposeDatePickerDate) {
+    fun updateUiState(uiState: DatePickerUiState) {
+        _uiState.value = uiState
+    }
+
+    fun setDate(
+        date: ComposeDatePickerDate,
+        calendar: Calendar = Calendar.getInstance()
+    ) {
         val yearMin = Constant.years.first()
         val yearMax = Constant.years.last()
 
         if (date.year < yearMin || date.year > yearMax) {
-            throw IllegalArgumentException("Invalid year: ${date.year}, year value must be between $yearMin to $yearMax.")
+            throw IllegalArgumentException("Invalid year: ${date.year}, The year value must be between $yearMin (inclusive) to $yearMax (inclusive).")
         }
         if (date.month < 0 || date.month > 11) {
-            throw IllegalArgumentException("Invalid month: ${date.month}, month value must be between 0 to 11.")
+            throw IllegalArgumentException("Invalid month: ${date.month}, The month value must be between 0 (inclusive) to 11 (inclusive).")
         }
 
-        val calendar = Calendar.getInstance()
         calendar[Calendar.YEAR] = date.year
         calendar[Calendar.MONTH] = date.month
 
         val maxDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         if (date.day < 1) {
-            throw IllegalArgumentException("Invalid day: ${date.day}, day value must be greater than zero.")
+            throw IllegalArgumentException("Invalid day: ${date.day}, The day value must be greater than zero.")
         }
         if (date.day > maxDays) {
-            throw IllegalArgumentException("Invalid day: ${date.day}, day value must be less than equal to $maxDays for given month.")
+            throw IllegalArgumentException("Invalid day: ${date.day}, The day value must be less than equal to $maxDays for given month (${Constant.months[date.month]}).")
         }
 
         val index = Constant.years.indexOf(date.year)
