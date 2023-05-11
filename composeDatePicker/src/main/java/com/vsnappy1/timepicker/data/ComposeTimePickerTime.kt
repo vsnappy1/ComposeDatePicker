@@ -7,9 +7,10 @@ import com.vsnappy1.timepicker.enums.TimeOfDay
 import java.util.Calendar
 
 sealed class ComposeTimePickerTime {
-    class TwelveHourTime(hour: Int, minute: Int, timeOfDay: TimeOfDay) : ComposeTimePickerTime()
+    class TwelveHourTime(val hour: Int, val minute: Int, val timeOfDay: TimeOfDay) :
+        ComposeTimePickerTime()
 
-    class TwentyFourHourTime(hour: Int, minute: Int) : ComposeTimePickerTime()
+    class TwentyFourHourTime(val hour: Int, val minute: Int) : ComposeTimePickerTime()
 }
 
 
@@ -17,15 +18,17 @@ object DefaultTime {
     fun getTime(context: Context, minuteGap: MinuteGap, is24Hour: Boolean?): ComposeTimePickerTime {
         val calendar = Calendar.getInstance()
         val is24 = is24Hour ?: DateFormat.is24HourFormat(context)
+        val minute =
+            Constant.getNearestNextMinute(Calendar.getInstance()[Calendar.MINUTE], minuteGap)
         return if (is24) {
             ComposeTimePickerTime.TwentyFourHourTime(
                 calendar[Calendar.HOUR_OF_DAY],
-                0
+                minute
             )
         } else {
             ComposeTimePickerTime.TwelveHourTime(
-                calendar[Calendar.HOUR] + 1,
-                0,
+                calendar[Calendar.HOUR],
+                minute,
                 if (calendar[Calendar.AM_PM] == 1) TimeOfDay.PM else TimeOfDay.AM
             )
         }

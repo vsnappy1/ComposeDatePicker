@@ -4,7 +4,7 @@ import com.vsnappy1.timepicker.enums.MinuteGap
 
 object Constant {
 
-    private const val repeatCount = 15
+    private const val repeatCount: Int = 60
 
     private fun findHours(is24Hour: Boolean): List<String> {
         if (is24Hour) return listOf(
@@ -45,13 +45,14 @@ object Constant {
     }
 
     fun getMiddleOfHour(is24Hour: Boolean): Int {
-        return (if (is24Hour) 24 else 11) * repeatCount / 2
+        return if (is24Hour) 24 * (repeatCount / 2)
+        else 12 * (repeatCount / 2)
     }
 
     fun getMiddleOfMinute(minuteGap: MinuteGap): Int {
-        return if (minuteGap.gap == 1) 60 * repeatCount / 2
-        else if (minuteGap == MinuteGap.FIVE) 12 * repeatCount / 2
-        else 6 * repeatCount / 2
+        return if (minuteGap.gap == 1) 61 * (repeatCount / 2)
+        else if (minuteGap == MinuteGap.FIVE) 13 * (repeatCount / 2)
+        else 7 * (repeatCount / 2)
     }
 
     private fun findMinutes(minuteGap: MinuteGap): List<String> {

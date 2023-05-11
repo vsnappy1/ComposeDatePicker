@@ -48,7 +48,6 @@ fun SwipeLazyColumn(
     content: LazyListScope.() -> Unit
 ) {
     var lastSelectedIndex by remember { mutableStateOf(0) }
-    var count by remember { mutableStateOf(0) }
 
     LaunchedEffect(key1 = Unit) {
         listState.scrollToItem(selectedIndex)
@@ -58,8 +57,7 @@ fun SwipeLazyColumn(
             val index =
                 listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > height.value / numberOfRowsDisplayed) 1 else 0
             onSelectedIndexChange(index)
-            count = if (index == lastSelectedIndex) ++count else 0
-            if (count >= 4) {
+            if (index == lastSelectedIndex) {
                 listState.animateScrollToItem(selectedIndex)
             }
             lastSelectedIndex = index

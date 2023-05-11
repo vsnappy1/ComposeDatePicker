@@ -13,7 +13,7 @@ data class TimePickerConfiguration(
     val backgroundColor: Color = Color.Transparent,
     val backgroundShape: Shape = RoundedCornerShape(0.dp),
     val height: Dp = 210.dp,
-    val width: Dp = 100.dp,
+    val width: Dp = 120.dp,
     val unselectedTextStyle: TextStyle = TextStyle(
         fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
