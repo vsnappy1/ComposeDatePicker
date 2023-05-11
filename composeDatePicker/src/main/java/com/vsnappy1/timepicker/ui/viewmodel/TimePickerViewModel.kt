@@ -3,7 +3,7 @@ package com.vsnappy1.timepicker.ui.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.vsnappy1.timepicker.data.ComposeTimePickerTime
+import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
 import com.vsnappy1.timepicker.enums.TimeOfDay
 import com.vsnappy1.timepicker.ui.model.TimePickerUiState
 
@@ -44,6 +44,4 @@ class TimePickerViewModel : ViewModel() {
     fun updateUiState(uiState: TimePickerUiState) {
         _uiState.value = uiState
     }
-
-
 }

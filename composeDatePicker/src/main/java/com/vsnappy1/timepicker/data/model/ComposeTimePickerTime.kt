@@ -1,7 +1,8 @@
-package com.vsnappy1.timepicker.data
+package com.vsnappy1.timepicker.data.model
 
 import android.content.Context
 import android.text.format.DateFormat
+import com.vsnappy1.timepicker.data.Constant
 import com.vsnappy1.timepicker.enums.MinuteGap
 import com.vsnappy1.timepicker.enums.TimeOfDay
 import java.util.Calendar
@@ -9,7 +10,6 @@ import java.util.Calendar
 sealed class ComposeTimePickerTime {
     class TwelveHourTime(val hour: Int, val minute: Int, val timeOfDay: TimeOfDay) :
         ComposeTimePickerTime()
-
     class TwentyFourHourTime(val hour: Int, val minute: Int) : ComposeTimePickerTime()
 }
 

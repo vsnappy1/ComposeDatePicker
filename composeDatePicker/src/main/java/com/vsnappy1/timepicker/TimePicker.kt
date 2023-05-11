@@ -35,8 +35,8 @@ import com.vsnappy1.datepicker.extension.noRippleClickable
 import com.vsnappy1.theme.Size.extraLarge
 import com.vsnappy1.theme.Size.medium
 import com.vsnappy1.theme.grayLight
-import com.vsnappy1.timepicker.data.ComposeTimePickerTime
-import com.vsnappy1.timepicker.data.DefaultTime
+import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
+import com.vsnappy1.timepicker.data.model.DefaultTime
 import com.vsnappy1.timepicker.enums.MinuteGap
 import com.vsnappy1.timepicker.enums.TimeOfDay
 import com.vsnappy1.timepicker.ui.model.TimePickerConfiguration

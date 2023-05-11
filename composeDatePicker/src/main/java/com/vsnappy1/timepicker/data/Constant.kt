@@ -49,12 +49,6 @@ object Constant {
         else 12 * (repeatCount / 2)
     }
 
-    fun getMiddleOfMinute(minuteGap: MinuteGap): Int {
-        return if (minuteGap.gap == 1) 61 * (repeatCount / 2)
-        else if (minuteGap == MinuteGap.FIVE) 13 * (repeatCount / 2)
-        else 7 * (repeatCount / 2)
-    }
-
     private fun findMinutes(minuteGap: MinuteGap): List<String> {
         var value = 0
         val list = mutableListOf<String>()
@@ -73,8 +67,10 @@ object Constant {
         return list
     }
 
-    fun getTimesOfDay(): List<String> {
-        return listOf("AM", "PM")
+    fun getMiddleOfMinute(minuteGap: MinuteGap): Int {
+        return if (minuteGap.gap == 1) 61 * (repeatCount / 2)
+        else if (minuteGap == MinuteGap.FIVE) 13 * (repeatCount / 2)
+        else 7 * (repeatCount / 2)
     }
 
     fun getNearestNextMinute(minute: Int, minuteGap: MinuteGap): Int {
@@ -85,5 +81,9 @@ object Constant {
         }
         return if (value > 60) 0
         else value
+    }
+
+    fun getTimesOfDay(): List<String> {
+        return listOf("AM", "PM")
     }
 }

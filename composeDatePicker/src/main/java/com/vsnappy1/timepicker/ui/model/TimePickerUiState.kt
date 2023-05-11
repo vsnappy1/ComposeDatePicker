@@ -2,7 +2,6 @@ package com.vsnappy1.timepicker.ui.model
 
 import com.vsnappy1.timepicker.data.Constant
 import com.vsnappy1.timepicker.enums.MinuteGap
-import com.vsnappy1.timepicker.enums.TimeOfDay
 import java.util.Calendar
 
 data class TimePickerUiState(
