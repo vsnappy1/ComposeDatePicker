@@ -40,7 +40,6 @@ import com.vsnappy1.timepicker.data.model.DefaultTime
 import com.vsnappy1.timepicker.enums.MinuteGap
 import com.vsnappy1.timepicker.enums.TimeOfDay
 import com.vsnappy1.timepicker.ui.model.TimePickerConfiguration
-import com.vsnappy1.timepicker.ui.model.TimePickerUiState
 import com.vsnappy1.timepicker.ui.viewmodel.TimePickerViewModel
 import kotlinx.coroutines.launch
 
@@ -55,15 +54,8 @@ fun TimePicker(
 ) {
     val viewModel: TimePickerViewModel = viewModel()
     val timePickerTime = time ?: DefaultTime.getTime(LocalContext.current, minuteGap, is24Hour)
-
-    val timePickerUiState = TimePickerUiState(
-        is24Hour = timePickerTime is ComposeTimePickerTime.TwentyFourHourTime,
-        minuteGap = minuteGap
-    )
-    LaunchedEffect(key1 = Unit) {
-        viewModel.updateUiState(timePickerUiState)
-    }
-
+    val timePickerUiState = viewModel.getUiStateTimeProvided(timePickerTime, minuteGap)
+    LaunchedEffect(key1 = Unit) { viewModel.updateUiState(timePickerTime, minuteGap) }
     val uiState by viewModel.uiState.observeAsState(timePickerUiState)
 
     TimePickerView(

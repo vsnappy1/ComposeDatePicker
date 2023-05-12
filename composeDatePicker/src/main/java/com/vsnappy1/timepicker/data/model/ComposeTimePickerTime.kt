@@ -10,6 +10,7 @@ import java.util.Calendar
 sealed class ComposeTimePickerTime {
     class TwelveHourTime(val hour: Int, val minute: Int, val timeOfDay: TimeOfDay) :
         ComposeTimePickerTime()
+
     class TwentyFourHourTime(val hour: Int, val minute: Int) : ComposeTimePickerTime()
 }
 
@@ -27,7 +28,7 @@ object DefaultTime {
             )
         } else {
             ComposeTimePickerTime.TwelveHourTime(
-                calendar[Calendar.HOUR],
+                calendar[Calendar.HOUR] + 1,
                 minute,
                 if (calendar[Calendar.AM_PM] == 1) TimeOfDay.PM else TimeOfDay.AM
             )

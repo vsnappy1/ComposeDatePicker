@@ -46,7 +46,7 @@ object Constant {
 
     fun getMiddleOfHour(is24Hour: Boolean): Int {
         return if (is24Hour) 24 * (repeatCount / 2)
-        else 12 * (repeatCount / 2)
+        else 12 * (repeatCount / 2) - 1
     }
 
     private fun findMinutes(minuteGap: MinuteGap): List<String> {
