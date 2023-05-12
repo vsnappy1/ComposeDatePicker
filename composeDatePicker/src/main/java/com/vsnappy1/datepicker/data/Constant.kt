@@ -13,6 +13,8 @@ import com.vsnappy1.datepicker.extension.isLeapYear
 import java.util.Calendar
 
 object Constant {
+    private const val repeatCount: Int = 60
+
     val days = listOf(
         SUNDAY,
         MONDAY,
@@ -38,11 +40,17 @@ object Constant {
         "December",
     )
 
-    val months = listOf(
-        monthNames, monthNames, monthNames, monthNames, monthNames, monthNames, monthNames,
-        monthNames, monthNames, monthNames, monthNames, monthNames, monthNames
-    ).flatten()
-    const val monthMiddleIndex = 72
+    fun getMonths(): List<String> {
+        val list = mutableListOf<String>()
+        for (i in 1..repeatCount) {
+            list.addAll(monthNames)
+        }
+        return list
+    }
+
+    fun getMiddleOfMonth(): Int {
+        return 12 * (repeatCount / 2)
+    }
 
     fun getMonths(year: Int): List<Month> {
         return listOf(

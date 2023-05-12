@@ -182,12 +182,14 @@ private fun MonthAndYearView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             SwipeLazyColumn(
+                modifier = Modifier.weight(0.5f),
                 selectedIndex = selectedMonth,
                 onSelectedIndexChange = onMonthChange,
                 items = months,
                 configuration = configuration
             )
             SwipeLazyColumn(
+                modifier = Modifier.weight(0.5f),
                 selectedIndex = selectedYear,
                 onSelectedIndexChange = onYearChange,
                 items = years,
@@ -258,7 +260,10 @@ private fun SliderItem(
     Box(
         modifier = Modifier
             .height(configuration.height / configuration.numberOfRowsDisplayed)
-            .width(configuration.width)
+            .padding(
+                start = if (alignment == Alignment.CenterStart) configuration.width else 0.dp,
+                end = if (alignment == Alignment.CenterEnd) configuration.width else 0.dp
+            )
     ) {
         if (value >= gap && value < items.size + gap) {
             Box(modifier = Modifier

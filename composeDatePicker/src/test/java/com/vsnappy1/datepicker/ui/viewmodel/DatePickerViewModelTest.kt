@@ -170,7 +170,7 @@ class DatePickerViewModelTest {
             //Then
             assertTrue(viewModel.uiState.value?.isMonthYearViewVisible == false)
             assertEquals(
-                Constant.monthMiddleIndex + 5,
+                Constant.getMiddleOfMonth() + 5,
                 viewModel.uiState.value?.selectedMonthIndex,
             )
         }

@@ -13,8 +13,7 @@ import com.vsnappy1.theme.black
 data class MonthYearViewConfiguration(
     val backgroundColor: Color = Color.Transparent,
     val backgroundShape: Shape = RoundedCornerShape(0.dp),
-    val height: Dp = 210.dp,
-    val width: Dp = 100.dp,
+
     val unselectedTextStyle: TextStyle = TextStyle(
         fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
@@ -26,5 +25,7 @@ data class MonthYearViewConfiguration(
         color = black.copy(alpha = 1f)
     ),
     val scaleFactor: Float = 1.2f,
+    val height: Dp = 210.dp,
+    val width: Dp = 115.dp - selectedTextStyle.fontSize.value.dp * scaleFactor,
     val numberOfRowsDisplayed: Int = 7
 )

@@ -27,7 +27,10 @@ class DatePickerViewModel : ViewModel() {
 
     private fun updateCurrentVisibleMonth(month: Int) {
         _uiState.value?.apply {
-            _uiState.value = this.copy(currentVisibleMonth = availableMonths[month])
+            _uiState.value = this.copy(
+                currentVisibleMonth = availableMonths[month],
+                selectedMonthIndex = getAdjustedSelectedMonthIndex(month)
+            )
         }
     }
 
@@ -93,7 +96,7 @@ class DatePickerViewModel : ViewModel() {
         }
     }
 
-    private fun getAdjustedSelectedMonthIndex(index: Int) = Constant.monthMiddleIndex + index % 12
+    private fun getAdjustedSelectedMonthIndex(index: Int) = Constant.getMiddleOfMonth() + index % 12
 
     fun updateSelectedYearIndex(index: Int) {
         availableMonths = Constant.getMonths(Constant.years[index])
@@ -148,7 +151,7 @@ class DatePickerViewModel : ViewModel() {
             throw IllegalArgumentException("Invalid day: ${date.day}, The day value must be greater than zero.")
         }
         if (date.day > maxDays) {
-            throw IllegalArgumentException("Invalid day: ${date.day}, The day value must be less than equal to $maxDays for given month (${Constant.months[date.month]}).")
+            throw IllegalArgumentException("Invalid day: ${date.day}, The day value must be less than equal to $maxDays for given month (${Constant.getMonths()[date.month]}).")
         }
 
         val index = Constant.years.indexOf(date.year)

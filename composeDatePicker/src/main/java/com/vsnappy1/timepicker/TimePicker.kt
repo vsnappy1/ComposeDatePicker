@@ -5,12 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -28,7 +26,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vsnappy1.datepicker.extension.noRippleClickable
@@ -131,23 +128,25 @@ private fun TimePickerView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             SwipeLazyColumn(
+                modifier = Modifier.weight(if (is24Hour) 0.5f else 0.4f),
                 selectedIndex = selectedHourIndex,
                 onSelectedIndexChange = onSelectedHourIndexChange,
                 items = hours,
                 alignment = Alignment.CenterEnd,
                 configuration = configuration
             )
-            Spacer(modifier = Modifier.width(extraLarge * 2))
             SwipeLazyColumn(
+                modifier = Modifier.weight(if (is24Hour) 0.5f else 0.2f),
                 selectedIndex = selectedMinuteIndex,
                 onSelectedIndexChange = onSelectedMinuteIndexChange,
                 items = minutes,
+                textAlign = if (is24Hour) TextAlign.Start else TextAlign.Center,
                 alignment = if (is24Hour) Alignment.CenterStart else Alignment.Center,
                 configuration = configuration.copy(width = if (is24Hour) configuration.width else configuration.width / 2)
             )
             if (!is24Hour) {
-                Spacer(modifier = Modifier.width(extraLarge * 2))
                 SwipeLazyColumn(
+                    modifier = Modifier.weight(0.4f),
                     selectedIndex = selectedTimeOfDayIndex,
                     onSelectedIndexChange = onSelectedTimeOfDayIndexChange,
                     items = timesOfDay,
@@ -165,6 +164,7 @@ private fun SwipeLazyColumn(
     selectedIndex: Int,
     onSelectedIndexChange: (Int) -> Unit,
     items: List<String>,
+    textAlign: TextAlign = TextAlign.End,
     alignment: Alignment = Alignment.CenterStart,
     configuration: TimePickerConfiguration
 ) {
@@ -189,6 +189,7 @@ private fun SwipeLazyColumn(
                 items = items,
                 configuration = configuration,
                 alignment = alignment,
+                textAlign = textAlign,
                 onItemClick = { index ->
                     onSelectedIndexChange(index)
                     coroutineScope.launch {
@@ -211,7 +212,7 @@ private fun SliderItem(
     onItemClick: (Int) -> Unit,
     alignment: Alignment,
     configuration: TimePickerConfiguration,
-    textWidth: Dp = configuration.selectedTextStyle.fontSize.value.dp * configuration.scaleFactor * 1.5f,
+    textAlign: TextAlign,
 ) {
     // this gap variable helps in maintaining list as center focused list
     val gap = configuration.numberOfRowsDisplayed / 2
@@ -220,7 +221,10 @@ private fun SliderItem(
     Box(
         modifier = Modifier
             .height(configuration.height / configuration.numberOfRowsDisplayed)
-            .width(configuration.width)
+            .padding(
+                start = if (alignment == Alignment.CenterStart) extraLarge else 0.dp,
+                end = if (alignment == Alignment.CenterEnd) extraLarge else 0.dp
+            )
     ) {
         if (value >= gap && value < items.size + gap) {
             Box(modifier = Modifier
@@ -231,11 +235,10 @@ private fun SliderItem(
                 Text(
                     text = items[value - gap],
                     modifier = Modifier
-                        .width(textWidth)
                         .align(alignment)
                         .scale(scale),
                     style = if (isSelected) configuration.selectedTextStyle else configuration.unselectedTextStyle,
-                    textAlign = TextAlign.End
+                    textAlign = textAlign
                 )
             }
         }
