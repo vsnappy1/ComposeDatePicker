@@ -9,12 +9,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vsnappy1.datepicker.theme.black
-import com.vsnappy1.datepicker.theme.blue
-import com.vsnappy1.datepicker.theme.grayDark
-import com.vsnappy1.datepicker.theme.grayLight
-import com.vsnappy1.datepicker.theme.red
-import com.vsnappy1.datepicker.theme.white
+import com.vsnappy1.theme.black
+import com.vsnappy1.theme.blue
+import com.vsnappy1.theme.grayDark
+import com.vsnappy1.theme.grayLight
+import com.vsnappy1.theme.red
+import com.vsnappy1.theme.white
 
 data class DateViewConfiguration(
     val backgroundColor: Color = Color.Transparent,

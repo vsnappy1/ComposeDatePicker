@@ -1,4 +1,4 @@
-package com.vsnappy1.datepicker.theme
+package com.vsnappy1.theme
 
 import androidx.compose.ui.unit.dp
 

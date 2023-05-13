@@ -8,7 +8,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vsnappy1.datepicker.theme.black
+import com.vsnappy1.theme.black
 
 data class HeaderConfiguration(
     val backgroundColor: Color = Color.Transparent,

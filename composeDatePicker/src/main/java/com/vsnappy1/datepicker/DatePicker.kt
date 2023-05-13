@@ -1,6 +1,5 @@
 package com.vsnappy1.datepicker
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -19,7 +18,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
@@ -44,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.vsnappy1.component.AnimatedFadeVisibility
 import com.vsnappy1.composedatepicker.R
 import com.vsnappy1.datepicker.data.Constant
 import com.vsnappy1.datepicker.data.model.ComposeDatePickerDate
@@ -52,15 +51,13 @@ import com.vsnappy1.datepicker.data.model.Month
 import com.vsnappy1.datepicker.data.model.SelectionLimiter
 import com.vsnappy1.datepicker.enums.Days
 import com.vsnappy1.datepicker.extension.noRippleClickable
-import com.vsnappy1.datepicker.theme.Size.medium
-import com.vsnappy1.datepicker.theme.Size.small
-import com.vsnappy1.datepicker.theme.grayLight
-import com.vsnappy1.datepicker.ui.AnimatedFadeVisibility
 import com.vsnappy1.datepicker.ui.model.DatePickerUiState
 import com.vsnappy1.datepicker.ui.model.DateViewConfiguration
 import com.vsnappy1.datepicker.ui.model.HeaderConfiguration
 import com.vsnappy1.datepicker.ui.model.MonthYearViewConfiguration
 import com.vsnappy1.datepicker.ui.viewmodel.DatePickerViewModel
+import com.vsnappy1.theme.Size.medium
+import com.vsnappy1.theme.Size.small
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
@@ -68,7 +65,7 @@ import kotlin.math.ceil
 @Composable
 fun DatePicker(
     modifier: Modifier = Modifier,
-    onDateSelected: (Int, Int, Int) -> Unit = { _: Int, _: Int, _: Int -> },
+    onDateSelected: (Int, Int, Int) -> Unit,
     date: ComposeDatePickerDate = DefaultDate.defaultDate,
     selectionLimiter: SelectionLimiter = SelectionLimiter(),
     headerConfiguration: HeaderConfiguration = HeaderConfiguration(),
@@ -171,10 +168,10 @@ private fun MonthAndYearView(
             modifier = modifier
                 .padding(horizontal = medium)
                 .fillMaxWidth()
-                .height(40.dp)
+                .height(configuration.selectedAreaHeight)
                 .background(
-                    color = grayLight.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(medium)
+                    color = configuration.selectedAreaColor,
+                    shape = configuration.selectedAreaShape
                 )
         )
         Row(
@@ -183,12 +180,14 @@ private fun MonthAndYearView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             SwipeLazyColumn(
+                modifier = Modifier.weight(0.5f),
                 selectedIndex = selectedMonth,
                 onSelectedIndexChange = onMonthChange,
                 items = months,
                 configuration = configuration
             )
             SwipeLazyColumn(
+                modifier = Modifier.weight(0.5f),
                 selectedIndex = selectedYear,
                 onSelectedIndexChange = onYearChange,
                 items = years,
@@ -199,7 +198,6 @@ private fun MonthAndYearView(
     }
 }
 
-@SuppressLint("FrequentlyChangedStateReadInComposition")
 @Composable
 private fun SwipeLazyColumn(
     modifier: Modifier = Modifier,
@@ -212,7 +210,7 @@ private fun SwipeLazyColumn(
     val coroutineScope = rememberCoroutineScope()
     var isAutoScrolling by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
-    com.vsnappy1.datepicker.ui.SwipeLazyColumn(
+    com.vsnappy1.component.SwipeLazyColumn(
         modifier = modifier,
         selectedIndex = selectedIndex,
         onSelectedIndexChange = onSelectedIndexChange,
@@ -260,7 +258,10 @@ private fun SliderItem(
     Box(
         modifier = Modifier
             .height(configuration.height / configuration.numberOfRowsDisplayed)
-            .width(configuration.width)
+            .padding(
+                start = if (alignment == Alignment.CenterStart) configuration.width else 0.dp,
+                end = if (alignment == Alignment.CenterEnd) configuration.width else 0.dp
+            )
     ) {
         if (value >= gap && value < items.size + gap) {
             Box(modifier = Modifier
@@ -467,5 +468,5 @@ private fun CalendarHeader(
 @Preview
 @Composable
 fun DefaultDatePicker() {
-    DatePicker()
+    DatePicker(onDateSelected = { _: Int, _: Int, _: Int -> })
 }
