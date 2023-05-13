@@ -1,10 +1,13 @@
-package com.vsnappy1.datepicker.extension
+package com.vsnappy1.extension
 
+import android.content.res.Resources
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import java.util.Calendar
 
 fun Int.isLeapYear(): Boolean {
@@ -31,3 +34,5 @@ fun Calendar.isEqual(calendar: Calendar?): Boolean {
     }
     return false
 }
+
+fun Int.toDp(): Dp = (this / Resources.getSystem().displayMetrics.density).dp

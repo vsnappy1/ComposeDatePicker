@@ -50,7 +50,7 @@ import com.vsnappy1.datepicker.data.model.DefaultDate
 import com.vsnappy1.datepicker.data.model.Month
 import com.vsnappy1.datepicker.data.model.SelectionLimiter
 import com.vsnappy1.datepicker.enums.Days
-import com.vsnappy1.datepicker.extension.noRippleClickable
+import com.vsnappy1.extension.noRippleClickable
 import com.vsnappy1.datepicker.ui.model.DatePickerUiState
 import com.vsnappy1.datepicker.ui.model.DateViewConfiguration
 import com.vsnappy1.datepicker.ui.model.HeaderConfiguration

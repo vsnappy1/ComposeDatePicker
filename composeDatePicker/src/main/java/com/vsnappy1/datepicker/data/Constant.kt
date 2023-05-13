@@ -9,7 +9,7 @@ import com.vsnappy1.datepicker.enums.Days.THURSDAY
 import com.vsnappy1.datepicker.enums.Days.TUESDAY
 import com.vsnappy1.datepicker.enums.Days.WEDNESDAY
 import com.vsnappy1.datepicker.data.model.Month
-import com.vsnappy1.datepicker.extension.isLeapYear
+import com.vsnappy1.extension.isLeapYear
 import java.util.Calendar
 
 internal object Constant {

@@ -10,12 +10,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vsnappy1.theme.Size
 import com.vsnappy1.theme.grayLight
-
+//TODO move backgroundColor, backgroundShape, height, width if possible transfer all
 data class TimePickerConfiguration(
-    val backgroundColor: Color = Color.Transparent,
-    val backgroundShape: Shape = RoundedCornerShape(0.dp),
     val height: Dp = 210.dp,
-    val width: Dp = 120.dp,
     val unselectedTextStyle: TextStyle = TextStyle(
         fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
@@ -24,7 +21,7 @@ data class TimePickerConfiguration(
     val selectedTextStyle: TextStyle = TextStyle(
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
-        color = Color.Black.copy(alpha = 1f)
+        color = Color.Black
     ),
     val scaleFactor: Float = 1.2f,
     val numberOfRowsDisplayed: Int = 7,

@@ -13,6 +13,10 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+        aarMetadata{
+            minCompileSdk 24
+        }
     }
 
     buildTypes {
@@ -31,6 +35,7 @@ android {
     buildFeatures {
         compose true
     }
+    testFixtures {enable true}
     buildToolsVersion '33.0.0'
 }
 

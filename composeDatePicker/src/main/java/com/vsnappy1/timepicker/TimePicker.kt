@@ -22,12 +22,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.vsnappy1.datepicker.extension.noRippleClickable
+import com.vsnappy1.extension.noRippleClickable
+import com.vsnappy1.extension.toDp
 import com.vsnappy1.theme.Size.extraLarge
 import com.vsnappy1.theme.Size.medium
 import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
@@ -36,6 +39,7 @@ import com.vsnappy1.timepicker.enums.MinuteGap
 import com.vsnappy1.timepicker.enums.TimeOfDay
 import com.vsnappy1.timepicker.ui.model.TimePickerConfiguration
 import com.vsnappy1.timepicker.ui.viewmodel.TimePickerViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -101,56 +105,66 @@ private fun TimePickerView(
     is24Hour: Boolean,
     configuration: TimePickerConfiguration,
 ) {
+    var height by remember { mutableStateOf(configuration.height) }
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = Unit) {// So that view gets some time to redraw based on given height
+        delay(10)
+        visible = true
+    }
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .height(configuration.height + medium * 2)
-            .background(
-                color = configuration.backgroundColor,
-                shape = configuration.backgroundShape
-            ),
+            .onGloballyPositioned {
+                if (it.size.height == 0) return@onGloballyPositioned
+                height = it.size.height.toDp() // Update the height
+            },
     ) {
-        Box(
-            modifier = Modifier
-                .padding(horizontal = medium)
-                .fillMaxWidth()
-                .height(configuration.selectedAreaHeight)
-                .background(
-                    color = configuration.selectedAreaColor,
-                    shape = configuration.selectedAreaShape
-                )
-        )
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            SwipeLazyColumn(
-                modifier = Modifier.weight(if (is24Hour) 0.5f else 0.4f),
-                selectedIndex = selectedHourIndex,
-                onSelectedIndexChange = onSelectedHourIndexChange,
-                items = hours,
-                alignment = Alignment.CenterEnd,
-                configuration = configuration
+        Box(modifier = Modifier.fillMaxWidth())
+        if (visible) {
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = medium)
+                    .fillMaxWidth()
+                    .height(configuration.selectedAreaHeight)
+                    .background(
+                        color = configuration.selectedAreaColor,
+                        shape = configuration.selectedAreaShape
+                    )
             )
-            SwipeLazyColumn(
-                modifier = Modifier.weight(if (is24Hour) 0.5f else 0.2f),
-                selectedIndex = selectedMinuteIndex,
-                onSelectedIndexChange = onSelectedMinuteIndexChange,
-                items = minutes,
-                textAlign = if (is24Hour) TextAlign.Start else TextAlign.Center,
-                alignment = if (is24Hour) Alignment.CenterStart else Alignment.Center,
-                configuration = configuration.copy(width = if (is24Hour) configuration.width else configuration.width / 2)
-            )
-            if (!is24Hour) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 SwipeLazyColumn(
-                    modifier = Modifier.weight(0.4f),
-                    selectedIndex = selectedTimeOfDayIndex,
-                    onSelectedIndexChange = onSelectedTimeOfDayIndexChange,
-                    items = timesOfDay,
-                    alignment = Alignment.CenterStart,
-                    configuration = configuration
+                    modifier = Modifier.weight(if (is24Hour) 0.5f else 0.4f),
+                    selectedIndex = selectedHourIndex,
+                    onSelectedIndexChange = onSelectedHourIndexChange,
+                    items = hours,
+                    alignment = Alignment.CenterEnd,
+                    configuration = configuration,
+                    height = height
                 )
+                SwipeLazyColumn(
+                    modifier = Modifier.weight(if (is24Hour) 0.5f else 0.2f),
+                    selectedIndex = selectedMinuteIndex,
+                    onSelectedIndexChange = onSelectedMinuteIndexChange,
+                    items = minutes,
+                    textAlign = if (is24Hour) TextAlign.Start else TextAlign.Center,
+                    alignment = if (is24Hour) Alignment.CenterStart else Alignment.Center,
+                    configuration = configuration,
+                    height = height
+                )
+                if (!is24Hour) {
+                    SwipeLazyColumn(
+                        modifier = Modifier.weight(0.4f),
+                        selectedIndex = selectedTimeOfDayIndex,
+                        onSelectedIndexChange = onSelectedTimeOfDayIndexChange,
+                        items = timesOfDay,
+                        alignment = Alignment.CenterStart,
+                        configuration = configuration,
+                        height = height
+                    )
+                }
             }
         }
     }
@@ -164,7 +178,8 @@ private fun SwipeLazyColumn(
     items: List<String>,
     textAlign: TextAlign = TextAlign.End,
     alignment: Alignment = Alignment.CenterStart,
-    configuration: TimePickerConfiguration
+    configuration: TimePickerConfiguration,
+    height: Dp
 ) {
     val coroutineScope = rememberCoroutineScope()
     var isAutoScrolling by remember { mutableStateOf(false) }
@@ -174,7 +189,7 @@ private fun SwipeLazyColumn(
         selectedIndex = selectedIndex,
         onSelectedIndexChange = onSelectedIndexChange,
         isAutoScrolling = isAutoScrolling,
-        height = configuration.height,
+        height = height,
         numberOfRowsDisplayed = configuration.numberOfRowsDisplayed,
         listState = listState
     ) {
@@ -188,6 +203,7 @@ private fun SwipeLazyColumn(
                 configuration = configuration,
                 alignment = alignment,
                 textAlign = textAlign,
+                height = height,
                 onItemClick = { index ->
                     onSelectedIndexChange(index)
                     coroutineScope.launch {
@@ -210,6 +226,7 @@ private fun SliderItem(
     onItemClick: (Int) -> Unit,
     alignment: Alignment,
     configuration: TimePickerConfiguration,
+    height: Dp,
     textAlign: TextAlign,
 ) {
     // this gap variable helps in maintaining list as center focused list
@@ -218,7 +235,7 @@ private fun SliderItem(
     val scale by animateFloatAsState(targetValue = if (isSelected) configuration.scaleFactor else 1f)
     Box(
         modifier = Modifier
-            .height(configuration.height / configuration.numberOfRowsDisplayed)
+            .height(height / configuration.numberOfRowsDisplayed)
             .padding(
                 start = if (alignment == Alignment.CenterStart) extraLarge else 0.dp,
                 end = if (alignment == Alignment.CenterEnd) extraLarge else 0.dp
@@ -246,5 +263,5 @@ private fun SliderItem(
 @Preview
 @Composable
 fun PreviewTimePicker() {
-    TimePicker(onTimeSelected =  { _: Int, _: Int, _: TimeOfDay? -> })
+    TimePicker(onTimeSelected = { _: Int, _: Int, _: TimeOfDay? -> })
 }
