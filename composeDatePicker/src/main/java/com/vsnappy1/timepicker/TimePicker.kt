@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +30,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vsnappy1.datepicker.extension.noRippleClickable
 import com.vsnappy1.theme.Size.extraLarge
 import com.vsnappy1.theme.Size.medium
-import com.vsnappy1.theme.grayLight
 import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
 import com.vsnappy1.timepicker.data.model.DefaultTime
 import com.vsnappy1.timepicker.enums.MinuteGap
@@ -43,7 +41,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TimePicker(
     modifier: Modifier = Modifier,
-    onTimeSelected: (Int, Int, TimeOfDay?) -> Unit = { _: Int, _: Int, _: TimeOfDay? -> },
+    onTimeSelected: (Int, Int, TimeOfDay?) -> Unit,
     is24Hour: Boolean? = null,
     minuteGap: MinuteGap = MinuteGap.FIVE,
     time: ComposeTimePickerTime? = null, // This has more priority in terms of is24Hour
@@ -116,10 +114,10 @@ private fun TimePickerView(
             modifier = Modifier
                 .padding(horizontal = medium)
                 .fillMaxWidth()
-                .height(40.dp)
+                .height(configuration.selectedAreaHeight)
                 .background(
-                    color = grayLight.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(medium)
+                    color = configuration.selectedAreaColor,
+                    shape = configuration.selectedAreaShape
                 )
         )
         Row(
@@ -248,5 +246,5 @@ private fun SliderItem(
 @Preview
 @Composable
 fun PreviewTimePicker() {
-    TimePicker()
+    TimePicker(onTimeSelected =  { _: Int, _: Int, _: TimeOfDay? -> })
 }

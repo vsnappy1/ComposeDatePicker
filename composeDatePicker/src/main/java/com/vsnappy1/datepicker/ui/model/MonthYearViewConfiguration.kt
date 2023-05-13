@@ -8,7 +8,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vsnappy1.theme.Size
 import com.vsnappy1.theme.black
+import com.vsnappy1.theme.grayLight
 
 data class MonthYearViewConfiguration(
     val backgroundColor: Color = Color.Transparent,
@@ -27,5 +29,8 @@ data class MonthYearViewConfiguration(
     val scaleFactor: Float = 1.2f,
     val height: Dp = 210.dp,
     val width: Dp = 115.dp - selectedTextStyle.fontSize.value.dp * scaleFactor,
-    val numberOfRowsDisplayed: Int = 7
+    val numberOfRowsDisplayed: Int = 7,
+    val selectedAreaHeight: Dp = 40.dp,
+    val selectedAreaColor: Color = grayLight.copy(alpha = 0.2f),
+    val selectedAreaShape: Shape = RoundedCornerShape(Size.medium)
 )

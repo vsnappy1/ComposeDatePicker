@@ -8,6 +8,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vsnappy1.theme.Size
+import com.vsnappy1.theme.grayLight
 
 data class TimePickerConfiguration(
     val backgroundColor: Color = Color.Transparent,
@@ -25,5 +27,8 @@ data class TimePickerConfiguration(
         color = Color.Black.copy(alpha = 1f)
     ),
     val scaleFactor: Float = 1.2f,
-    val numberOfRowsDisplayed: Int = 7
+    val numberOfRowsDisplayed: Int = 7,
+    val selectedAreaHeight: Dp = 40.dp,
+    val selectedAreaColor: Color = grayLight.copy(alpha = 0.2f),
+    val selectedAreaShape: Shape = RoundedCornerShape(Size.medium)
 )

@@ -5,7 +5,7 @@ import com.vsnappy1.datepicker.data.model.Month
 import java.util.Calendar
 import kotlin.streams.toList
 
-data class DatePickerUiState(
+internal data class DatePickerUiState(
     val selectedYear: Int = Calendar.getInstance()[Calendar.YEAR],
     val selectedYearIndex: Int = Constant.years.size / 2,
     val selectedMonth: Month = Constant.getMonths(selectedYear)[Calendar.getInstance()[Calendar.MONTH]],

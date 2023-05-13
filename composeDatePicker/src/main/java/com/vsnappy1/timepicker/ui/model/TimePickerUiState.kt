@@ -4,7 +4,7 @@ import com.vsnappy1.timepicker.data.Constant
 import com.vsnappy1.timepicker.enums.MinuteGap
 import java.util.Calendar
 
-data class TimePickerUiState(
+internal data class TimePickerUiState(
     val is24Hour: Boolean = false,
     val minuteGap: MinuteGap = MinuteGap.FIVE,
     val hours: List<String> = Constant.getHours(is24Hour),

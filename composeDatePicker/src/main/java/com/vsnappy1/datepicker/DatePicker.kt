@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
@@ -59,7 +58,6 @@ import com.vsnappy1.datepicker.ui.model.MonthYearViewConfiguration
 import com.vsnappy1.datepicker.ui.viewmodel.DatePickerViewModel
 import com.vsnappy1.theme.Size.medium
 import com.vsnappy1.theme.Size.small
-import com.vsnappy1.theme.grayLight
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
@@ -67,7 +65,7 @@ import kotlin.math.ceil
 @Composable
 fun DatePicker(
     modifier: Modifier = Modifier,
-    onDateSelected: (Int, Int, Int) -> Unit = { _: Int, _: Int, _: Int -> },
+    onDateSelected: (Int, Int, Int) -> Unit,
     date: ComposeDatePickerDate = DefaultDate.defaultDate,
     selectionLimiter: SelectionLimiter = SelectionLimiter(),
     headerConfiguration: HeaderConfiguration = HeaderConfiguration(),
@@ -170,10 +168,10 @@ private fun MonthAndYearView(
             modifier = modifier
                 .padding(horizontal = medium)
                 .fillMaxWidth()
-                .height(40.dp)
+                .height(configuration.selectedAreaHeight)
                 .background(
-                    color = grayLight.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(medium)
+                    color = configuration.selectedAreaColor,
+                    shape = configuration.selectedAreaShape
                 )
         )
         Row(
@@ -470,5 +468,5 @@ private fun CalendarHeader(
 @Preview
 @Composable
 fun DefaultDatePicker() {
-    DatePicker()
+    DatePicker(onDateSelected = { _: Int, _: Int, _: Int -> })
 }

@@ -12,7 +12,7 @@ import com.vsnappy1.datepicker.data.model.Month
 import com.vsnappy1.datepicker.extension.isLeapYear
 import java.util.Calendar
 
-object Constant {
+internal object Constant {
     private const val repeatCount: Int = 60
 
     val days = listOf(

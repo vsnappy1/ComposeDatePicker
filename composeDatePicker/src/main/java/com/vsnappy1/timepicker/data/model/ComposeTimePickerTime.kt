@@ -28,7 +28,7 @@ object DefaultTime {
             )
         } else {
             ComposeTimePickerTime.TwelveHourTime(
-                calendar[Calendar.HOUR] + 1,
+                if (calendar[Calendar.HOUR] == 0) 12 else calendar[Calendar.HOUR],
                 minute,
                 if (calendar[Calendar.AM_PM] == 1) TimeOfDay.PM else TimeOfDay.AM
             )

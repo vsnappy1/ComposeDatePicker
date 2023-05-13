@@ -12,7 +12,7 @@ import com.vsnappy1.datepicker.ui.model.DatePickerUiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class DatePickerViewModel : ViewModel() {
+internal class DatePickerViewModel : ViewModel() {
 
     private var _uiState = MutableLiveData(DatePickerUiState())
     val uiState: LiveData<DatePickerUiState> = _uiState

@@ -2,7 +2,7 @@ package com.vsnappy1.timepicker.data
 
 import com.vsnappy1.timepicker.enums.MinuteGap
 
-object Constant {
+internal object Constant {
 
     private const val repeatCount: Int = 60
 

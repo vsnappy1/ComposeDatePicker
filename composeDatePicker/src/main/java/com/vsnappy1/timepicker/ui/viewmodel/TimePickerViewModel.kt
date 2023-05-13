@@ -9,7 +9,7 @@ import com.vsnappy1.timepicker.enums.MinuteGap
 import com.vsnappy1.timepicker.enums.TimeOfDay
 import com.vsnappy1.timepicker.ui.model.TimePickerUiState
 
-class TimePickerViewModel : ViewModel() {
+internal class TimePickerViewModel : ViewModel() {
 
     private val _uiState: MutableLiveData<TimePickerUiState> = MutableLiveData(TimePickerUiState())
     val uiState: LiveData<TimePickerUiState> = _uiState
@@ -90,7 +90,7 @@ class TimePickerViewModel : ViewModel() {
             is24Hour = is24,
             minuteGap = minuteGap,
             hours = Constant.getHours(is24),
-            selectedHourIndex = Constant.getMiddleOfHour(is24) + hour - if (is24) 0 else 1,
+            selectedHourIndex = Constant.getMiddleOfHour(is24) + hour,
             minutes = Constant.getMinutes(minuteGap),
             selectedMinuteIndex = Constant.getMiddleOfMinute(minuteGap) + minute / minuteGap.gap,
             timesOfDay = Constant.getTimesOfDay(),
