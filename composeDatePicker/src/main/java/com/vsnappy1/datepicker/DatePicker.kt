@@ -1,6 +1,5 @@
 package com.vsnappy1.datepicker
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -47,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vsnappy1.component.AnimatedFadeVisibility
 import com.vsnappy1.composedatepicker.R
+import com.vsnappy1.datepicker.ui.model.DatePickerConfiguration
 import com.vsnappy1.datepicker.data.Constant
 import com.vsnappy1.datepicker.data.model.ComposeDatePickerDate
 import com.vsnappy1.datepicker.data.model.DefaultDate
@@ -54,17 +54,11 @@ import com.vsnappy1.datepicker.data.model.Month
 import com.vsnappy1.datepicker.data.model.SelectionLimiter
 import com.vsnappy1.datepicker.enums.Days
 import com.vsnappy1.datepicker.ui.model.DatePickerUiState
-import com.vsnappy1.datepicker.ui.model.DateViewConfiguration
-import com.vsnappy1.datepicker.ui.model.HeaderConfiguration
-import com.vsnappy1.datepicker.ui.model.MonthYearViewConfiguration
 import com.vsnappy1.datepicker.ui.viewmodel.DatePickerViewModel
 import com.vsnappy1.extension.noRippleClickable
 import com.vsnappy1.extension.spToDp
 import com.vsnappy1.extension.toDp
-import com.vsnappy1.theme.Size.extraLarge
 import com.vsnappy1.theme.Size.medium
-import com.vsnappy1.theme.Size.small
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
@@ -75,22 +69,15 @@ fun DatePicker(
     onDateSelected: (Int, Int, Int) -> Unit,
     date: ComposeDatePickerDate = DefaultDate.defaultDate,
     selectionLimiter: SelectionLimiter = SelectionLimiter(),
-    headerConfiguration: HeaderConfiguration = HeaderConfiguration(),
-    dateViewConfiguration: DateViewConfiguration = DateViewConfiguration(),
-    monthYearViewConfiguration: MonthYearViewConfiguration = MonthYearViewConfiguration()
+    configuration: DatePickerConfiguration = DatePickerConfiguration.Builder().build()
 ) {
     val viewModel: DatePickerViewModel = viewModel()
 
-    var height by remember { mutableStateOf(288.dp) }
-    var visible by remember { mutableStateOf(false) }
-
-
+    var height by remember { mutableStateOf(configuration.height) }
 
     // Key is Unit because I want this to run only once not every time when is composable is recomposed.
     LaunchedEffect(key1 = Unit) {
         viewModel.setDate(date)
-        delay(10)
-        visible = true
     }
 
     val uiState by viewModel.uiState.observeAsState(
@@ -102,7 +89,7 @@ fun DatePicker(
     )
     Box(modifier = modifier.onGloballyPositioned {
         if (it.size.height == 0) return@onGloballyPositioned
-        height = it.size.height.toDp() - headerConfiguration.height// Update the height
+        height = it.size.height.toDp() - configuration.headerHeight// Update the height
     }) {
         // TODO add sliding effect when next or previous arrow is pressed
         CalendarHeader(
@@ -111,37 +98,34 @@ fun DatePicker(
             onNextClick = { viewModel.moveToNextMonth() },
             onPreviousClick = { viewModel.moveToPreviousMonth() },
             isPreviousNextVisible = !uiState.isMonthYearViewVisible,
-            configuration = headerConfiguration,
-            themeColor = dateViewConfiguration.selectedDateBackgroundColor
+            themeColor = configuration.dateSelectedBackgroundColor,
+            configuration = configuration,
         )
-        Spacer(modifier = Modifier.height(small))
         Box(
             modifier = Modifier
-                .padding(top = headerConfiguration.height)
+                .padding(top = configuration.headerHeight)
                 .height(height)
         ) {
             AnimatedFadeVisibility(
                 visible = !uiState.isMonthYearViewVisible
             ) {
-                if(visible){
-                    DateView(
-                        currentVisibleMonth = uiState.currentVisibleMonth,
-                        selectedYear = uiState.selectedYear,
-                        selectedMonth = uiState.selectedMonth,
-                        selectedDayOfMonth = uiState.selectedDayOfMonth,
-                        selectionLimiter = selectionLimiter,
-                        height = height,
-                        onDaySelected = {
-                            viewModel.updateSelectedDayAndMonth(it)
-                            onDateSelected(
-                                uiState.selectedYear,
-                                uiState.selectedMonth.number,
-                                uiState.selectedDayOfMonth
-                            )
-                        },
-                        configuration = dateViewConfiguration
-                    )
-                }
+                DateView(
+                    currentVisibleMonth = uiState.currentVisibleMonth,
+                    selectedYear = uiState.selectedYear,
+                    selectedMonth = uiState.selectedMonth,
+                    selectedDayOfMonth = uiState.selectedDayOfMonth,
+                    selectionLimiter = selectionLimiter,
+                    height = height,
+                    onDaySelected = {
+                        viewModel.updateSelectedDayAndMonth(it)
+                        onDateSelected(
+                            uiState.selectedYear,
+                            uiState.selectedMonth.number,
+                            uiState.selectedDayOfMonth
+                        )
+                    },
+                    configuration = configuration
+                )
             }
             AnimatedFadeVisibility(
                 visible = uiState.isMonthYearViewVisible
@@ -155,7 +139,7 @@ fun DatePicker(
                     years = uiState.years,
                     months = uiState.months,
                     height = height,
-                    configuration = monthYearViewConfiguration
+                    configuration = configuration
                 )
             }
         }
@@ -172,7 +156,7 @@ private fun MonthAndYearView(
     years: List<String>,
     months: List<String>,
     height: Dp,
-    configuration: MonthYearViewConfiguration
+    configuration: DatePickerConfiguration
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -183,10 +167,10 @@ private fun MonthAndYearView(
             modifier = modifier
                 .padding(horizontal = medium)
                 .fillMaxWidth()
-                .height(configuration.selectedAreaHeight)
+                .height(configuration.monthYearSelectedAreaHeight)
                 .background(
-                    color = configuration.selectedAreaColor,
-                    shape = configuration.selectedAreaShape
+                    color = configuration.monthYearSelectedAreaColor,
+                    shape = configuration.monthYearSelectedAreaShape
                 )
         )
         Row(
@@ -222,7 +206,7 @@ private fun SwipeLazyColumn(
     onSelectedIndexChange: (Int) -> Unit,
     items: List<String>,
     alignment: Alignment = Alignment.CenterStart,
-    configuration: MonthYearViewConfiguration,
+    configuration: DatePickerConfiguration,
     height: Dp
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -234,11 +218,11 @@ private fun SwipeLazyColumn(
         onSelectedIndexChange = onSelectedIndexChange,
         isAutoScrolling = isAutoScrolling,
         height = height,
-        numberOfRowsDisplayed = configuration.numberOfRowsDisplayed,
+        numberOfRowsDisplayed = configuration.monthYearNumberOfRowsDisplayed,
         listState = listState
     ) {
-        // we add some empty rows at the beginning and end of list to make it feel that it is a center focused list
-        val count = items.size + configuration.numberOfRowsDisplayed - 1
+        // I add some empty rows at the beginning and end of list to make it feel that it is a center focused list
+        val count = items.size + configuration.monthYearNumberOfRowsDisplayed - 1
         items(count) {
             SliderItem(
                 value = it,
@@ -268,16 +252,16 @@ private fun SliderItem(
     items: List<String>,
     onItemClick: (Int) -> Unit,
     alignment: Alignment,
-    configuration: MonthYearViewConfiguration,
+    configuration: DatePickerConfiguration,
     height: Dp
 ) {
     // this gap variable helps in maintaining list as center focused list
-    val gap = configuration.numberOfRowsDisplayed / 2
+    val gap = configuration.monthYearNumberOfRowsDisplayed / 2
     val isSelected = value == selectedIndex + gap
-    val scale by animateFloatAsState(targetValue = if (isSelected) configuration.scaleFactor else 1f)
+    val scale by animateFloatAsState(targetValue = if (isSelected) configuration.monthYearSelectedItemScaleFactor else 1f)
     Box(
         modifier = Modifier
-            .height(height / (configuration.numberOfRowsDisplayed))
+            .height(height / (configuration.monthYearNumberOfRowsDisplayed))
     ) {
         if (value >= gap && value < items.size + gap) {
             Box(
@@ -288,10 +272,10 @@ private fun SliderItem(
                     },
                 contentAlignment = if (alignment == Alignment.CenterEnd) Alignment.CenterStart else Alignment.CenterEnd
             ) {
-                configuration.selectedTextStyle.fontSize
+                configuration.monthYearSelectedTextStyle.fontSize
                 Box(
                     modifier = Modifier.width(
-                        configuration.selectedTextStyle.fontSize.spToDp(LocalDensity.current) * 5
+                        configuration.monthYearSelectedTextStyle.fontSize.spToDp(LocalDensity.current) * 5
                     )
                 ) {
                     Text(
@@ -299,7 +283,8 @@ private fun SliderItem(
                         modifier = Modifier
                             .align(alignment)
                             .scale(scale),
-                        style = if (isSelected) configuration.selectedTextStyle else configuration.unselectedTextStyle
+                        style = if (isSelected) configuration.monthYearSelectedTextStyle
+                        else configuration.monthYearUnselectedTextStyle
                     )
                 }
             }
@@ -317,7 +302,7 @@ private fun DateView(
     onDaySelected: (Int) -> Unit,
     selectedMonth: Month,
     height: Dp,
-    configuration: DateViewConfiguration
+    configuration: DatePickerConfiguration
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
@@ -327,18 +312,16 @@ private fun DateView(
         items(Constant.days) {
             DateViewHeaderItem(day = it, configuration = configuration)
         }
-        // since we may need few empty cells because every month starts with a different day(Monday, Tuesday, ..)
-        // that's way we add some number X into the count
+        // since I may need few empty cells because every month starts with a different day(Monday, Tuesday, ..)
+        // that's way I add some number X into the count
         val count =
             currentVisibleMonth.numberOfDays + currentVisibleMonth.firstDayOfMonth.number - 1
         val topPaddingForItem =
             getTopPaddingForItem(
                 count,
-                height - configuration.selectedDateBackgroundSize * 2,
-                configuration.selectedDateBackgroundSize
+                height - configuration.dateSelectedBackgroundSize * 2, // because I don't want to count first two rows
+                configuration.dateSelectedBackgroundSize
             )
-//        val topPaddingForItem =
-//            getTopPaddingForItem(count, configuration.selectedDateBackgroundSize)
         items(count) {
             if (it < currentVisibleMonth.firstDayOfMonth.number - 1) return@items // to create empty boxes
             DateViewBodyItem(
@@ -366,7 +349,7 @@ private fun DateViewBodyItem(
     selectionLimiter: SelectionLimiter,
     onDaySelected: (Int) -> Unit,
     topPaddingForItem: Dp,
-    configuration: DateViewConfiguration,
+    configuration: DatePickerConfiguration,
 ) {
     Box(
         contentAlignment = Alignment.Center
@@ -383,21 +366,22 @@ private fun DateViewBodyItem(
         Box(
             contentAlignment = Alignment.Center, modifier = Modifier
                 .padding(top = if (value < 7) 0.dp else topPaddingForItem) // I don't want first row to have any padding
-                .size(configuration.selectedDateBackgroundSize)
-                .clip(configuration.selectedDateBackgroundShape)
+                .size(configuration.dateSelectedBackgroundSize)
+                .clip(configuration.dateSelectedBackgroundShape)
                 .noRippleClickable(enabled = isWithinRange) { onDaySelected(day) }
-                .background(if (isSelected) configuration.selectedDateBackgroundColor else Color.Transparent)
+                .background(if (isSelected) configuration.dateSelectedBackgroundColor else Color.Transparent)
         ) {
             Text(
                 text = "$day",
                 textAlign = TextAlign.Center,
-                style = if (isSelected) configuration.selectedDateStyle.copy(color = if (isWithinRange) configuration.selectedDateStyle.color else configuration.disabledDateColor)
-                else configuration.unselectedDateStyle.copy(
+                style = if (isSelected) configuration.dateSelectedTextStyle
+                    .copy(color = if (isWithinRange) configuration.dateSelectedTextStyle.color else configuration.dateDisabledColor)
+                else configuration.dateUnselectedTextStyle.copy(
                     color = if (isWithinRange) {
-                        if (value % 7 == 0) configuration.sundayTextColor
-                        else configuration.unselectedDateStyle.color
+                        if (value % 7 == 0) configuration.dateSundayTextColor
+                        else configuration.dateUnselectedTextStyle.color
                     } else {
-                        configuration.disabledDateColor
+                        configuration.dateDisabledColor
                     }
                 ),
             )
@@ -407,32 +391,33 @@ private fun DateViewBodyItem(
 
 @Composable
 private fun DateViewHeaderItem(
-    configuration: DateViewConfiguration,
+    configuration: DatePickerConfiguration,
     day: Days
 ) {
     Box(
         contentAlignment = Alignment.Center, modifier = Modifier
-            .size(configuration.selectedDateBackgroundSize)
+            .size(configuration.dateSelectedBackgroundSize)
     ) {
         Text(
             text = day.abbreviation,
             textAlign = TextAlign.Center,
-            style = configuration.headerTextStyle.copy(
-                color = if (day.number == 1) configuration.sundayTextColor else configuration.headerTextStyle.color
+            style = configuration.dateDaysTextStyle.copy(
+                color = if (day.number == 1) configuration.dateSundayTextColor else configuration.dateDaysTextStyle.color
             ),
         )
     }
 }
 
-// Not every month has same number of weeks, so to maintain the same size for calender we add padding if there are less weeks
+// Not every month has same number of weeks, so to maintain the same size for calender I add padding if there are less weeks
 private fun getTopPaddingForItem(
     count: Int,
     height: Dp,
     size: Dp
 ): Dp {
     val numberOfRowsVisible = ceil(count.toDouble() / 7) - 1
-    return (height - (size * numberOfRowsVisible.toInt()) - medium) / numberOfRowsVisible.toInt()
-
+    val result =
+        (height - (size * numberOfRowsVisible.toInt()) - medium) / numberOfRowsVisible.toInt()
+    return if (result > 0.dp) result else 0.dp
 }
 
 @Composable
@@ -443,22 +428,22 @@ private fun CalendarHeader(
     onPreviousClick: () -> Unit,
     onMonthYearClick: () -> Unit,
     isPreviousNextVisible: Boolean,
-    configuration: HeaderConfiguration,
+    configuration: DatePickerConfiguration,
     themeColor: Color
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(configuration.height)
+            .height(configuration.headerHeight)
     ) {
         val textColor by
         animateColorAsState(
-            targetValue = if (isPreviousNextVisible) configuration.textStyle.color else themeColor,
+            targetValue = if (isPreviousNextVisible) configuration.headerTextStyle.color else themeColor,
             animationSpec = tween(durationMillis = 400, delayMillis = 100)
         )
         Text(
             text = title,
-            style = configuration.textStyle.copy(color = textColor),
+            style = configuration.headerTextStyle.copy(color = textColor),
             modifier = modifier
                 .padding(start = medium)
                 .noRippleClickable { onMonthYearClick() }
@@ -470,9 +455,9 @@ private fun CalendarHeader(
                 Icon(
                     imageVector = Icons.Rounded.KeyboardArrowLeft,
                     contentDescription = stringResource(id = R.string.leftArrow),
-                    tint = configuration.arrowColor,
+                    tint = configuration.headerArrowColor,
                     modifier = Modifier
-                        .size(configuration.arrowSize)
+                        .size(configuration.headerArrowSize)
                         .noRippleClickable { onPreviousClick() }
                 )
             }
@@ -481,9 +466,9 @@ private fun CalendarHeader(
                 Icon(
                     imageVector = Icons.Rounded.KeyboardArrowRight,
                     contentDescription = stringResource(id = R.string.leftArrow),
-                    tint = configuration.arrowColor,
+                    tint = configuration.headerArrowColor,
                     modifier = Modifier
-                        .size(configuration.arrowSize)
+                        .size(configuration.headerArrowSize)
                         .noRippleClickable { onNextClick() }
                 )
             }

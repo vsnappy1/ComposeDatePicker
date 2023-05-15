@@ -39,7 +39,6 @@ import com.vsnappy1.timepicker.enums.MinuteGap
 import com.vsnappy1.timepicker.enums.TimeOfDay
 import com.vsnappy1.timepicker.ui.model.TimePickerConfiguration
 import com.vsnappy1.timepicker.ui.viewmodel.TimePickerViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -49,7 +48,7 @@ fun TimePicker(
     is24Hour: Boolean? = null,
     minuteGap: MinuteGap = MinuteGap.FIVE,
     time: ComposeTimePickerTime? = null, // This has more priority in terms of is24Hour
-    timePickerConfiguration: TimePickerConfiguration = TimePickerConfiguration(),
+    configuration: TimePickerConfiguration = TimePickerConfiguration.Builder().build(),
 ) {
     val viewModel: TimePickerViewModel = viewModel()
     val timePickerTime = time ?: DefaultTime.getTime(LocalContext.current, minuteGap, is24Hour)
@@ -78,7 +77,7 @@ fun TimePicker(
             viewModel.getSelectedTime()?.trigger(onTimeSelected)
         },
         is24Hour = uiState.is24Hour,
-        configuration = timePickerConfiguration
+        configuration = configuration
     )
 }
 
@@ -106,11 +105,6 @@ private fun TimePickerView(
     configuration: TimePickerConfiguration,
 ) {
     var height by remember { mutableStateOf(configuration.height) }
-    var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(key1 = Unit) {// So that view gets some time to redraw based on given height
-        delay(10)
-        visible = true
-    }
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -120,51 +114,49 @@ private fun TimePickerView(
             },
     ) {
         Box(modifier = Modifier.fillMaxWidth())
-        if (visible) {
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = medium)
-                    .fillMaxWidth()
-                    .height(configuration.selectedAreaHeight)
-                    .background(
-                        color = configuration.selectedAreaColor,
-                        shape = configuration.selectedAreaShape
-                    )
+        Box(
+            modifier = Modifier
+                .padding(horizontal = medium)
+                .fillMaxWidth()
+                .height(configuration.selectedAreaHeight)
+                .background(
+                    color = configuration.selectedAreaColor,
+                    shape = configuration.selectedAreaShape
+                )
+        )
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SwipeLazyColumn(
+                modifier = Modifier.weight(if (is24Hour) 0.5f else 0.4f),
+                selectedIndex = selectedHourIndex,
+                onSelectedIndexChange = onSelectedHourIndexChange,
+                items = hours,
+                alignment = Alignment.CenterEnd,
+                configuration = configuration,
+                height = height
             )
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            SwipeLazyColumn(
+                modifier = Modifier.weight(if (is24Hour) 0.5f else 0.2f),
+                selectedIndex = selectedMinuteIndex,
+                onSelectedIndexChange = onSelectedMinuteIndexChange,
+                items = minutes,
+                textAlign = if (is24Hour) TextAlign.Start else TextAlign.Center,
+                alignment = if (is24Hour) Alignment.CenterStart else Alignment.Center,
+                configuration = configuration,
+                height = height
+            )
+            if (!is24Hour) {
                 SwipeLazyColumn(
-                    modifier = Modifier.weight(if (is24Hour) 0.5f else 0.4f),
-                    selectedIndex = selectedHourIndex,
-                    onSelectedIndexChange = onSelectedHourIndexChange,
-                    items = hours,
-                    alignment = Alignment.CenterEnd,
+                    modifier = Modifier.weight(0.4f),
+                    selectedIndex = selectedTimeOfDayIndex,
+                    onSelectedIndexChange = onSelectedTimeOfDayIndexChange,
+                    items = timesOfDay,
+                    alignment = Alignment.CenterStart,
                     configuration = configuration,
                     height = height
                 )
-                SwipeLazyColumn(
-                    modifier = Modifier.weight(if (is24Hour) 0.5f else 0.2f),
-                    selectedIndex = selectedMinuteIndex,
-                    onSelectedIndexChange = onSelectedMinuteIndexChange,
-                    items = minutes,
-                    textAlign = if (is24Hour) TextAlign.Start else TextAlign.Center,
-                    alignment = if (is24Hour) Alignment.CenterStart else Alignment.Center,
-                    configuration = configuration,
-                    height = height
-                )
-                if (!is24Hour) {
-                    SwipeLazyColumn(
-                        modifier = Modifier.weight(0.4f),
-                        selectedIndex = selectedTimeOfDayIndex,
-                        onSelectedIndexChange = onSelectedTimeOfDayIndexChange,
-                        items = timesOfDay,
-                        alignment = Alignment.CenterStart,
-                        configuration = configuration,
-                        height = height
-                    )
-                }
             }
         }
     }
