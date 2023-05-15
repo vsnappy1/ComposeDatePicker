@@ -22,7 +22,7 @@ class TimePickerConfiguration private constructor(
     val selectedAreaShape: Shape
 ) {
     class Builder {
-        private var height: Dp = 210.dp
+        private var height: Dp = 230.dp
         private var unselectedTextStyle: TextStyle = TextStyle(
             fontSize = 17.sp,
             fontWeight = FontWeight.W400,
