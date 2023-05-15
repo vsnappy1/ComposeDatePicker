@@ -7,9 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -19,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.vsnappy1.composecalendarexample.ui.theme.ComposeCalendarExampleTheme
 import com.vsnappy1.datepicker.DatePicker
 import com.vsnappy1.timepicker.TimePicker
+import com.vsnappy1.timepicker.ui.model.TimePickerConfiguration
 
 private const val TAG = "MainActivity"
 
@@ -34,7 +33,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Column {
                         DatePicker(
-                            modifier = Modifier.padding(16.dp).background(Color.Cyan, RoundedCornerShape(8.dp)),
+                            modifier = Modifier.padding(16.dp),
                             onDateSelected = { year, month, day ->
                                 Log.d(TAG, "Date: $month/$day/$year")
                             },

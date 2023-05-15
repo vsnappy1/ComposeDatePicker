@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vsnappy1.component.AnimatedFadeVisibility
 import com.vsnappy1.composedatepicker.R
-import com.vsnappy1.configuration.DatePickerConfiguration
+import com.vsnappy1.datepicker.ui.model.DatePickerConfiguration
 import com.vsnappy1.datepicker.data.Constant
 import com.vsnappy1.datepicker.data.model.ComposeDatePickerDate
 import com.vsnappy1.datepicker.data.model.DefaultDate

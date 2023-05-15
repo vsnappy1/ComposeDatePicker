@@ -1,4 +1,4 @@
-package com.vsnappy1.configuration
+package com.vsnappy1.datepicker.ui.model
 
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,7 +46,7 @@ class DatePickerConfiguration private constructor(
         private var headerHeight: Dp = 35.dp
         private var headerTextStyle: TextStyle = TextStyle(
             fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.W600,
             color = black
         )
         private var headerArrowSize: Dp = 35.dp
@@ -54,7 +54,7 @@ class DatePickerConfiguration private constructor(
 
         private var dateDaysTextStyle: TextStyle = TextStyle(
             fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.W500,
             color = grayDark
         )
         private var dateUnselectedTextStyle: TextStyle = TextStyle(
@@ -74,13 +74,13 @@ class DatePickerConfiguration private constructor(
         private var dateSelectedBackgroundShape: Shape = CircleShape
 
         private var monthYearUnselectedTextStyle: TextStyle = TextStyle(
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
+            fontSize = 17.sp,
+            fontWeight = FontWeight.W400,
             color = black.copy(alpha = 0.5f)
         )
         private var monthYearSelectedTextStyle: TextStyle = TextStyle(
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 17.sp,
+            fontWeight = FontWeight.W500,
             color = black.copy(alpha = 1f)
         )
         private var monthYearSelectedItemScaleFactor: Float = 1.2f
