@@ -17,8 +17,6 @@ import com.vsnappy1.theme.red
 import com.vsnappy1.theme.white
 
 data class DateViewConfiguration(
-    val backgroundColor: Color = Color.Transparent,
-    val backgroundShape: Shape = RoundedCornerShape(0.dp),
     val headerTextStyle: TextStyle = TextStyle(
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
@@ -36,7 +34,7 @@ data class DateViewConfiguration(
     ),
     val sundayTextColor: Color = red,
     val disabledDateColor: Color = grayLight,
-    val selectedDateBackgroundShape: Shape = CircleShape,
     val selectedDateBackgroundSize: Dp = 40.dp,
     val selectedDateBackgroundColor: Color = blue,
+    val selectedDateBackgroundShape: Shape = CircleShape,
 )

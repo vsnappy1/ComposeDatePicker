@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Column {
                         DatePicker(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(16.dp).background(Color.Cyan, RoundedCornerShape(8.dp)),
                             onDateSelected = { year, month, day ->
                                 Log.d(TAG, "Date: $month/$day/$year")
                             },

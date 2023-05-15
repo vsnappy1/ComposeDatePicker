@@ -1,12 +1,17 @@
 package com.vsnappy1.extension
 
+import android.content.Context
 import android.content.res.Resources
+import android.util.TypedValue
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import java.util.Calendar
 
@@ -36,3 +41,9 @@ fun Calendar.isEqual(calendar: Calendar?): Boolean {
 }
 
 fun Int.toDp(): Dp = (this / Resources.getSystem().displayMetrics.density).dp
+
+fun TextUnit.spToDp(density: Density): Dp{
+    return with(density) {
+        this@spToDp.toDp()
+    }
+}

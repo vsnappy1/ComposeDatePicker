@@ -1,5 +1,6 @@
 package com.vsnappy1.datepicker
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -36,6 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,14 +53,18 @@ import com.vsnappy1.datepicker.data.model.DefaultDate
 import com.vsnappy1.datepicker.data.model.Month
 import com.vsnappy1.datepicker.data.model.SelectionLimiter
 import com.vsnappy1.datepicker.enums.Days
-import com.vsnappy1.extension.noRippleClickable
 import com.vsnappy1.datepicker.ui.model.DatePickerUiState
 import com.vsnappy1.datepicker.ui.model.DateViewConfiguration
 import com.vsnappy1.datepicker.ui.model.HeaderConfiguration
 import com.vsnappy1.datepicker.ui.model.MonthYearViewConfiguration
 import com.vsnappy1.datepicker.ui.viewmodel.DatePickerViewModel
+import com.vsnappy1.extension.noRippleClickable
+import com.vsnappy1.extension.spToDp
+import com.vsnappy1.extension.toDp
+import com.vsnappy1.theme.Size.extraLarge
 import com.vsnappy1.theme.Size.medium
 import com.vsnappy1.theme.Size.small
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
@@ -74,12 +81,16 @@ fun DatePicker(
 ) {
     val viewModel: DatePickerViewModel = viewModel()
 
-    // there may be 4 to 6 weeks in a month plus we have header that also makes an row
-    val totalRows = 8f
+    var height by remember { mutableStateOf(288.dp) }
+    var visible by remember { mutableStateOf(false) }
+
+
 
     // Key is Unit because I want this to run only once not every time when is composable is recomposed.
     LaunchedEffect(key1 = Unit) {
         viewModel.setDate(date)
+        delay(10)
+        visible = true
     }
 
     val uiState by viewModel.uiState.observeAsState(
@@ -89,7 +100,10 @@ fun DatePicker(
             selectedDayOfMonth = date.day
         )
     )
-    Box(modifier = modifier) {
+    Box(modifier = modifier.onGloballyPositioned {
+        if (it.size.height == 0) return@onGloballyPositioned
+        height = it.size.height.toDp() - headerConfiguration.height// Update the height
+    }) {
         // TODO add sliding effect when next or previous arrow is pressed
         CalendarHeader(
             title = "${uiState.currentVisibleMonth.name} ${uiState.selectedYear}",
@@ -103,28 +117,31 @@ fun DatePicker(
         Spacer(modifier = Modifier.height(small))
         Box(
             modifier = Modifier
-                .height(dateViewConfiguration.selectedDateBackgroundSize * totalRows + small)
                 .padding(top = headerConfiguration.height)
+                .height(height)
         ) {
             AnimatedFadeVisibility(
                 visible = !uiState.isMonthYearViewVisible
             ) {
-                DateView(
-                    currentVisibleMonth = uiState.currentVisibleMonth,
-                    selectedYear = uiState.selectedYear,
-                    selectedMonth = uiState.selectedMonth,
-                    selectedDayOfMonth = uiState.selectedDayOfMonth,
-                    selectionLimiter = selectionLimiter,
-                    onDaySelected = {
-                        viewModel.updateSelectedDayAndMonth(it)
-                        onDateSelected(
-                            uiState.selectedYear,
-                            uiState.selectedMonth.number,
-                            uiState.selectedDayOfMonth
-                        )
-                    },
-                    configuration = dateViewConfiguration
-                )
+                if(visible){
+                    DateView(
+                        currentVisibleMonth = uiState.currentVisibleMonth,
+                        selectedYear = uiState.selectedYear,
+                        selectedMonth = uiState.selectedMonth,
+                        selectedDayOfMonth = uiState.selectedDayOfMonth,
+                        selectionLimiter = selectionLimiter,
+                        height = height,
+                        onDaySelected = {
+                            viewModel.updateSelectedDayAndMonth(it)
+                            onDateSelected(
+                                uiState.selectedYear,
+                                uiState.selectedMonth.number,
+                                uiState.selectedDayOfMonth
+                            )
+                        },
+                        configuration = dateViewConfiguration
+                    )
+                }
             }
             AnimatedFadeVisibility(
                 visible = uiState.isMonthYearViewVisible
@@ -137,7 +154,8 @@ fun DatePicker(
                     onYearChange = { viewModel.updateSelectedYearIndex(it) },
                     years = uiState.years,
                     months = uiState.months,
-                    configuration = monthYearViewConfiguration.copy(height = dateViewConfiguration.selectedDateBackgroundSize * 7)
+                    height = height,
+                    configuration = monthYearViewConfiguration
                 )
             }
         }
@@ -153,16 +171,13 @@ private fun MonthAndYearView(
     onYearChange: (Int) -> Unit,
     years: List<String>,
     months: List<String>,
+    height: Dp,
     configuration: MonthYearViewConfiguration
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .fillMaxSize()
-            .background(
-                color = configuration.backgroundColor,
-                shape = configuration.backgroundShape
-            ),
+            .fillMaxSize(),
     ) {
         Box(
             modifier = modifier
@@ -184,6 +199,7 @@ private fun MonthAndYearView(
                 selectedIndex = selectedMonth,
                 onSelectedIndexChange = onMonthChange,
                 items = months,
+                height = height,
                 configuration = configuration
             )
             SwipeLazyColumn(
@@ -192,6 +208,7 @@ private fun MonthAndYearView(
                 onSelectedIndexChange = onYearChange,
                 items = years,
                 alignment = Alignment.CenterEnd,
+                height = height,
                 configuration = configuration
             )
         }
@@ -205,7 +222,8 @@ private fun SwipeLazyColumn(
     onSelectedIndexChange: (Int) -> Unit,
     items: List<String>,
     alignment: Alignment = Alignment.CenterStart,
-    configuration: MonthYearViewConfiguration
+    configuration: MonthYearViewConfiguration,
+    height: Dp
 ) {
     val coroutineScope = rememberCoroutineScope()
     var isAutoScrolling by remember { mutableStateOf(false) }
@@ -215,7 +233,7 @@ private fun SwipeLazyColumn(
         selectedIndex = selectedIndex,
         onSelectedIndexChange = onSelectedIndexChange,
         isAutoScrolling = isAutoScrolling,
-        height = configuration.height,
+        height = height,
         numberOfRowsDisplayed = configuration.numberOfRowsDisplayed,
         listState = listState
     ) {
@@ -228,6 +246,7 @@ private fun SwipeLazyColumn(
                 items = items,
                 configuration = configuration,
                 alignment = alignment,
+                height = height,
                 onItemClick = { index ->
                     onSelectedIndexChange(index)
                     coroutineScope.launch {
@@ -250,6 +269,7 @@ private fun SliderItem(
     onItemClick: (Int) -> Unit,
     alignment: Alignment,
     configuration: MonthYearViewConfiguration,
+    height: Dp
 ) {
     // this gap variable helps in maintaining list as center focused list
     val gap = configuration.numberOfRowsDisplayed / 2
@@ -257,25 +277,31 @@ private fun SliderItem(
     val scale by animateFloatAsState(targetValue = if (isSelected) configuration.scaleFactor else 1f)
     Box(
         modifier = Modifier
-            .height(configuration.height / configuration.numberOfRowsDisplayed)
-            .padding(
-                start = if (alignment == Alignment.CenterStart) configuration.width else 0.dp,
-                end = if (alignment == Alignment.CenterEnd) configuration.width else 0.dp
-            )
+            .height(height / (configuration.numberOfRowsDisplayed))
     ) {
         if (value >= gap && value < items.size + gap) {
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .noRippleClickable {
-                    onItemClick(value - gap)
-                }) {
-                Text(
-                    text = items[value - gap],
-                    modifier = Modifier
-                        .align(alignment)
-                        .scale(scale),
-                    style = if (isSelected) configuration.selectedTextStyle else configuration.unselectedTextStyle
-                )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .noRippleClickable {
+                        onItemClick(value - gap)
+                    },
+                contentAlignment = if (alignment == Alignment.CenterEnd) Alignment.CenterStart else Alignment.CenterEnd
+            ) {
+                configuration.selectedTextStyle.fontSize
+                Box(
+                    modifier = Modifier.width(
+                        configuration.selectedTextStyle.fontSize.spToDp(LocalDensity.current) * 5
+                    )
+                ) {
+                    Text(
+                        text = items[value - gap],
+                        modifier = Modifier
+                            .align(alignment)
+                            .scale(scale),
+                        style = if (isSelected) configuration.selectedTextStyle else configuration.unselectedTextStyle
+                    )
+                }
             }
         }
     }
@@ -290,15 +316,13 @@ private fun DateView(
     selectionLimiter: SelectionLimiter,
     onDaySelected: (Int) -> Unit,
     selectedMonth: Month,
+    height: Dp,
     configuration: DateViewConfiguration
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
         userScrollEnabled = false,
-        modifier = modifier.background(
-            color = configuration.backgroundColor,
-            shape = configuration.backgroundShape
-        )
+        modifier = modifier
     ) {
         items(Constant.days) {
             DateViewHeaderItem(day = it, configuration = configuration)
@@ -308,7 +332,13 @@ private fun DateView(
         val count =
             currentVisibleMonth.numberOfDays + currentVisibleMonth.firstDayOfMonth.number - 1
         val topPaddingForItem =
-            getTopPaddingForItem(count, configuration.selectedDateBackgroundSize)
+            getTopPaddingForItem(
+                count,
+                height - configuration.selectedDateBackgroundSize * 2,
+                configuration.selectedDateBackgroundSize
+            )
+//        val topPaddingForItem =
+//            getTopPaddingForItem(count, configuration.selectedDateBackgroundSize)
         items(count) {
             if (it < currentVisibleMonth.firstDayOfMonth.number - 1) return@items // to create empty boxes
             DateViewBodyItem(
@@ -397,11 +427,12 @@ private fun DateViewHeaderItem(
 // Not every month has same number of weeks, so to maintain the same size for calender we add padding if there are less weeks
 private fun getTopPaddingForItem(
     count: Int,
-    itemSize: Dp
+    height: Dp,
+    size: Dp
 ): Dp {
-    val numberOfRowsVisible = ceil(count.toDouble() / 7)
-    val remainingRows: Int = 6 - numberOfRowsVisible.toInt()
-    return (itemSize * remainingRows) / (numberOfRowsVisible.toInt() - 1)
+    val numberOfRowsVisible = ceil(count.toDouble() / 7) - 1
+    return (height - (size * numberOfRowsVisible.toInt()) - medium) / numberOfRowsVisible.toInt()
+
 }
 
 @Composable
@@ -417,10 +448,6 @@ private fun CalendarHeader(
 ) {
     Box(
         modifier = Modifier
-            .background(
-                color = configuration.backgroundColor,
-                shape = configuration.backgroundShape
-            )
             .fillMaxWidth()
             .height(configuration.height)
     ) {
