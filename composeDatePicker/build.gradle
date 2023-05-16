@@ -7,6 +7,7 @@ plugins {
 android {
     namespace 'com.vsnappy1.composedatepicker'
     compileSdk 33
+    buildToolsVersion '33.0.0'
 
     defaultConfig {
         minSdk 24
@@ -16,10 +17,6 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
-
-        aarMetadata{
-            minCompileSdk 24
-        }
     }
 
     buildTypes {
@@ -38,7 +35,13 @@ android {
     buildFeatures {
         compose true
     }
-    buildToolsVersion '33.0.0'
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
@@ -49,7 +52,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-
 
     // Compose
     implementation platform('androidx.compose:compose-bom:2022.10.00')
@@ -62,17 +64,10 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0'
     implementation "androidx.compose.runtime:runtime-livedata"
 
+    //Testing
     testImplementation "androidx.arch.core:core-testing:2.2.0"
     testImplementation 'org.mockito:mockito-core:4.4.0'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
 }
 
-afterEvaluate {
-    publishing{
-        publications{
-            release(MavenPublication){
-                from components.release
-            }
-        }
-    }
-}
+
