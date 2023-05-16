@@ -31,15 +31,22 @@ class SelectionLimiter(
             fromDate == null && toDate == null -> {
                 return true
             }
+
+            fromDate != null && toDate != null -> {
+                (selectedDate.before(toDate) && selectedDate.after(fromDate)) ||
+                        (selectedDate.isEqual(toDate) || selectedDate.isEqual(fromDate))
+            }
+
             fromDate != null -> {
                 selectedDate.after(fromDate) || selectedDate.isEqual(fromDate)
             }
+
             toDate != null -> {
                 selectedDate.before(toDate) || selectedDate.isEqual(toDate)
             }
+
             else -> {
-                (selectedDate.before(toDate) && selectedDate.after(fromDate)) ||
-                        (selectedDate.isEqual(toDate) || selectedDate.isEqual(fromDate))
+                true
             }
         }
     }
