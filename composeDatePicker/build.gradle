@@ -13,7 +13,7 @@ android {
         minSdk 24
         targetSdk 33
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -34,13 +34,6 @@ android {
     }
     buildFeatures {
         compose true
-    }
-
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-            withJavadocJar()
-        }
     }
 }
 
@@ -68,6 +61,23 @@ dependencies {
     testImplementation "androidx.arch.core:core-testing:2.2.0"
     testImplementation 'org.mockito:mockito-core:4.4.0'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+
+                // You can then customize attributes of the publication as shown below.
+                groupId = "com.github.vsnappy1"
+                artifactId = "composedatepicker"
+                version = "1.0"
+            }
+        }
+    }
 }
 
 
