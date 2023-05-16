@@ -42,11 +42,11 @@ class DatePickerConfiguration private constructor(
 
 
     class Builder {
-        private var height: Dp = 288.dp
+        private var height: Dp = 260.dp
         private var headerHeight: Dp = 35.dp
         private var headerTextStyle: TextStyle = TextStyle(
             fontSize = 16.sp,
-            fontWeight = FontWeight.W600,
+            fontWeight = FontWeight.W700,
             color = black
         )
         private var headerArrowSize: Dp = 35.dp
@@ -58,34 +58,34 @@ class DatePickerConfiguration private constructor(
             color = grayDark
         )
         private var dateUnselectedTextStyle: TextStyle = TextStyle(
-            fontSize = 17.sp,
-            fontWeight = FontWeight.W400,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.W500,
             color = black
         )
         private var dateSelectedTextStyle: TextStyle = TextStyle(
-            fontSize = 17.sp,
-            fontWeight = FontWeight.W500,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.W600,
             color = white
         )
         private var dateSundayTextColor: Color = red
         private var dateDisabledColor: Color = grayLight
-        private var dateSelectedBackgroundSize: Dp = 40.dp
+        private var dateSelectedBackgroundSize: Dp = 35.dp
         private var dateSelectedBackgroundColor: Color = blue
         private var dateSelectedBackgroundShape: Shape = CircleShape
 
         private var monthYearUnselectedTextStyle: TextStyle = TextStyle(
-            fontSize = 17.sp,
-            fontWeight = FontWeight.W400,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.W500,
             color = black.copy(alpha = 0.5f)
         )
         private var monthYearSelectedTextStyle: TextStyle = TextStyle(
             fontSize = 17.sp,
-            fontWeight = FontWeight.W500,
+            fontWeight = FontWeight.W600,
             color = black.copy(alpha = 1f)
         )
         private var monthYearSelectedItemScaleFactor: Float = 1.2f
         private var monthYearNumberOfRowsDisplayed: Int = 7
-        private var monthYearSelectedAreaHeight: Dp = 40.dp
+        private var monthYearSelectedAreaHeight: Dp = 35.dp
         private var monthYearSelectedAreaColor: Color = grayLight.copy(alpha = 0.2f)
         private var monthYearSelectedAreaShape: Shape = RoundedCornerShape(Size.medium)
 
