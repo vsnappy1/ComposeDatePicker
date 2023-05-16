@@ -15,7 +15,7 @@ Step 2. Add the dependency
 ```kotlin
 dependencies {
     ..
-    implementation 'com.github.vsnappy1:ComposeDatePicker:1.1.1'
+    implementation 'com.github.vsnappy1:ComposeDatePicker:1.2.1'
 }
 ```
 
