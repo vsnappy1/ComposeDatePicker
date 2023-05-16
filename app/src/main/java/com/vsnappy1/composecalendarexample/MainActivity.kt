@@ -13,11 +13,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.vsnappy1.composecalendarexample.ui.theme.ComposeCalendarExampleTheme
 import com.vsnappy1.datepicker.DatePicker
 import com.vsnappy1.datepicker.data.model.ComposeDatePickerDate
 import com.vsnappy1.datepicker.data.model.SelectionLimiter
+import com.vsnappy1.datepicker.ui.model.DatePickerConfiguration
 import com.vsnappy1.timepicker.TimePicker
 import com.vsnappy1.timepicker.ui.model.TimePickerConfiguration
 
@@ -38,10 +40,11 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(16.dp),
                             onDateSelected = { year, month, day ->
                             },
-                            selectionLimiter = SelectionLimiter(
-                                fromDate = ComposeDatePickerDate(year = 2023, month = 4, day = 7),
-                                toDate = ComposeDatePickerDate(year = 2023, month = 4, day = 21)
-                            )
+                            configuration = DatePickerConfiguration.Builder()
+                                .height(height = 300.dp)
+                                .dateTextStyle(textStyle = TextStyle(Color.Black.copy(alpha = 0.5f)))
+                                .selectedDateTextStyle(textStyle = TextStyle(Color.Black))
+                                .build()
                         )
 
                         TimePicker(modifier = Modifier.padding(16.dp),
