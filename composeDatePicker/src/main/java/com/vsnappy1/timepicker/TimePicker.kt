@@ -118,10 +118,10 @@ private fun TimePickerView(
             modifier = Modifier
                 .padding(horizontal = medium)
                 .fillMaxWidth()
-                .height(configuration.selectedAreaHeight)
+                .height(configuration.selectedTimeAreaHeight)
                 .background(
-                    color = configuration.selectedAreaColor,
-                    shape = configuration.selectedAreaShape
+                    color = configuration.selectedTimeAreaColor,
+                    shape = configuration.selectedTimeAreaShape
                 )
         )
         Row(
@@ -182,11 +182,11 @@ private fun SwipeLazyColumn(
         onSelectedIndexChange = onSelectedIndexChange,
         isAutoScrolling = isAutoScrolling,
         height = height,
-        numberOfRowsDisplayed = configuration.numberOfRowsDisplayed,
+        numberOfRowsDisplayed = configuration.numberOfTimeRowsDisplayed,
         listState = listState
     ) {
         // we add some empty rows at the beginning and end of list to make it feel that it is a center focused list
-        val count = items.size + configuration.numberOfRowsDisplayed - 1
+        val count = items.size + configuration.numberOfTimeRowsDisplayed - 1
         items(count) {
             SliderItem(
                 value = it,
@@ -222,12 +222,12 @@ private fun SliderItem(
     textAlign: TextAlign,
 ) {
     // this gap variable helps in maintaining list as center focused list
-    val gap = configuration.numberOfRowsDisplayed / 2
+    val gap = configuration.numberOfTimeRowsDisplayed / 2
     val isSelected = value == selectedIndex + gap
-    val scale by animateFloatAsState(targetValue = if (isSelected) configuration.scaleFactor else 1f)
+    val scale by animateFloatAsState(targetValue = if (isSelected) configuration.selectedTimeScaleFactor else 1f)
     Box(
         modifier = Modifier
-            .height(height / configuration.numberOfRowsDisplayed)
+            .height(height / configuration.numberOfTimeRowsDisplayed)
             .padding(
                 start = if (alignment == Alignment.CenterStart) extraLarge else 0.dp,
                 end = if (alignment == Alignment.CenterEnd) extraLarge else 0.dp
@@ -244,7 +244,7 @@ private fun SliderItem(
                     modifier = Modifier
                         .align(alignment)
                         .scale(scale),
-                    style = if (isSelected) configuration.selectedTextStyle else configuration.unselectedTextStyle,
+                    style = if (isSelected) configuration.selectedTimeTextStyle else configuration.timeTextStyle,
                     textAlign = textAlign
                 )
             }

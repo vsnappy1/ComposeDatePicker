@@ -23,26 +23,28 @@ class DatePickerConfiguration private constructor(
     val headerTextStyle: TextStyle,
     val headerArrowSize: Dp,
     val headerArrowColor: Color,
-    val dateDaysTextStyle: TextStyle,
-    val dateUnselectedTextStyle: TextStyle,
-    val dateSelectedTextStyle: TextStyle,
-    val dateSundayTextColor: Color,
-    val dateDisabledColor: Color,
-    val dateSelectedBackgroundSize: Dp,
-    val dateSelectedBackgroundColor: Color,
-    val dateSelectedBackgroundShape: Shape,
-    val monthYearUnselectedTextStyle: TextStyle,
-    val monthYearSelectedTextStyle: TextStyle,
-    val monthYearSelectedItemScaleFactor: Float,
-    val monthYearNumberOfRowsDisplayed: Int,
-    val monthYearSelectedAreaHeight: Dp,
-    val monthYearSelectedAreaColor: Color,
-    val monthYearSelectedAreaShape: Shape
+    val daysNameTextStyle: TextStyle,
+    val dateTextStyle: TextStyle,
+    val selectedDateTextStyle: TextStyle,
+    val sundayTextColor: Color,
+    val disabledDateColor: Color,
+    val selectedDateBackgroundSize: Dp,
+    val selectedDateBackgroundColor: Color,
+    val selectedDateBackgroundShape: Shape,
+    val monthYearTextStyle: TextStyle,
+    val selectedMonthYearTextStyle: TextStyle,
+    val selectedMonthYearScaleFactor: Float,
+    val numberOfMonthYearRowsDisplayed: Int,
+    val selectedMonthYearAreaHeight: Dp,
+    val selectedMonthYearAreaColor: Color,
+    val selectedMonthYearAreaShape: Shape
 ) {
 
 
     class Builder {
         private var height: Dp = 260.dp
+
+        // Header configuration
         private var headerHeight: Dp = 35.dp
         private var headerTextStyle: TextStyle = TextStyle(
             fontSize = 16.sp,
@@ -52,42 +54,44 @@ class DatePickerConfiguration private constructor(
         private var headerArrowSize: Dp = 35.dp
         private var headerArrowColor: Color = black
 
-        private var dateDaysTextStyle: TextStyle = TextStyle(
+        // Date view configuration
+        private var daysNameTextStyle: TextStyle = TextStyle(
             fontSize = 12.sp,
             fontWeight = FontWeight.W500,
             color = grayDark
         )
-        private var dateUnselectedTextStyle: TextStyle = TextStyle(
+        private var dateTextStyle: TextStyle = TextStyle(
             fontSize = 16.sp,
             fontWeight = FontWeight.W500,
             color = black
         )
-        private var dateSelectedTextStyle: TextStyle = TextStyle(
+        private var selectedDateTextStyle: TextStyle = TextStyle(
             fontSize = 16.sp,
             fontWeight = FontWeight.W600,
             color = white
         )
-        private var dateSundayTextColor: Color = red
-        private var dateDisabledColor: Color = grayLight
-        private var dateSelectedBackgroundSize: Dp = 35.dp
-        private var dateSelectedBackgroundColor: Color = blue
-        private var dateSelectedBackgroundShape: Shape = CircleShape
+        private var sundayTextColor: Color = red
+        private var disabledDateColor: Color = grayLight
+        private var selectedDateBackgroundSize: Dp = 35.dp
+        private var selectedDateBackgroundColor: Color = blue
+        private var selectedDateBackgroundShape: Shape = CircleShape
 
-        private var monthYearUnselectedTextStyle: TextStyle = TextStyle(
+        // Month Year view configuration
+        private var monthYearTextStyle: TextStyle = TextStyle(
             fontSize = 16.sp,
             fontWeight = FontWeight.W500,
             color = black.copy(alpha = 0.5f)
         )
-        private var monthYearSelectedTextStyle: TextStyle = TextStyle(
+        private var selectedMonthYearTextStyle: TextStyle = TextStyle(
             fontSize = 17.sp,
             fontWeight = FontWeight.W600,
             color = black.copy(alpha = 1f)
         )
-        private var monthYearSelectedItemScaleFactor: Float = 1.2f
-        private var monthYearNumberOfRowsDisplayed: Int = 7
-        private var monthYearSelectedAreaHeight: Dp = 35.dp
-        private var monthYearSelectedAreaColor: Color = grayLight.copy(alpha = 0.2f)
-        private var monthYearSelectedAreaShape: Shape = RoundedCornerShape(Size.medium)
+        private var numberOfMonthYearRowsDisplayed: Int = 7
+        private var selectedMonthYearScaleFactor: Float = 1.2f
+        private var selectedMonthYearAreaHeight: Dp = 35.dp
+        private var selectedMonthYearAreaColor: Color = grayLight.copy(alpha = 0.2f)
+        private var selectedMonthYearAreaShape: Shape = RoundedCornerShape(Size.medium)
 
         fun height(height: Dp) =
             apply { this.height = height }
@@ -104,73 +108,73 @@ class DatePickerConfiguration private constructor(
         fun headerArrowColor(color: Color) =
             apply { this.headerArrowColor = color }
 
-        fun dateDaysTextStyle(textStyle: TextStyle) =
-            apply { this.dateDaysTextStyle = textStyle }
+        fun daysNameTextStyle(textStyle: TextStyle) =
+            apply { this.daysNameTextStyle = textStyle }
 
-        fun dateUnselectedTextStyle(textStyle: TextStyle) =
-            apply { this.dateUnselectedTextStyle = textStyle }
+        fun dateTextStyle(textStyle: TextStyle) =
+            apply { this.dateTextStyle = textStyle }
 
-        fun dateSelectedTextStyle(textStyle: TextStyle) =
-            apply { this.dateSelectedTextStyle = textStyle }
+        fun selectedDateTextStyle(textStyle: TextStyle) =
+            apply { this.selectedDateTextStyle = textStyle }
 
-        fun dateSundayTextColor(color: Color) =
-            apply { this.dateSundayTextColor = color }
+        fun sundayTextColor(color: Color) =
+            apply { this.sundayTextColor = color }
 
-        fun dateDisabledColor(color: Color) =
-            apply { this.dateDisabledColor = color }
+        fun disabledDateColor(color: Color) =
+            apply { this.disabledDateColor = color }
 
-        fun dateSelectedBackgroundSize(size: Dp) =
-            apply { this.dateSelectedBackgroundSize = size }
+        fun selectedDateBackgroundSize(size: Dp) =
+            apply { this.selectedDateBackgroundSize = size }
 
-        fun dateSelectedBackgroundColor(color: Color) =
-            apply { this.dateSelectedBackgroundColor = color }
+        fun selectedDateBackgroundColor(color: Color) =
+            apply { this.selectedDateBackgroundColor = color }
 
-        fun dateSelectedBackgroundShape(shape: Shape) =
-            apply { this.dateSelectedBackgroundShape = shape }
+        fun selectedDateBackgroundShape(shape: Shape) =
+            apply { this.selectedDateBackgroundShape = shape }
 
-        fun monthYearUnselectedTextStyle(textStyle: TextStyle) =
-            apply { this.monthYearUnselectedTextStyle = textStyle }
+        fun monthYearTextStyle(textStyle: TextStyle) =
+            apply { this.monthYearTextStyle = textStyle }
 
-        fun monthYearSelectedTextStyle(textStyle: TextStyle) =
-            apply { this.monthYearSelectedTextStyle = textStyle }
+        fun selectedMonthYearTextStyle(textStyle: TextStyle) =
+            apply { this.selectedMonthYearTextStyle = textStyle }
 
-        fun monthYearSelectedItemScaleFactor(scaleFactor: Float) =
-            apply { this.monthYearSelectedItemScaleFactor = scaleFactor }
+        fun selectedMonthYearScaleFactor(scaleFactor: Float) =
+            apply { this.selectedMonthYearScaleFactor = scaleFactor }
 
-        fun monthYearNumberOfRowsDisplayed(count: Int) =
-            apply { this.monthYearNumberOfRowsDisplayed = count }
+        fun numberOfMonthYearRowsDisplayed(count: Int) =
+            apply { this.numberOfMonthYearRowsDisplayed = count }
 
-        fun monthYearSelectedAreaHeight(height: Dp) =
-            apply { this.monthYearSelectedAreaHeight = height }
+        fun selectedMonthYearAreaHeight(height: Dp) =
+            apply { this.selectedMonthYearAreaHeight = height }
 
-        fun monthYearSelectedAreaColor(color: Color) =
-            apply { this.monthYearSelectedAreaColor = color }
+        fun selectedMonthYearAreaColor(color: Color) =
+            apply { this.selectedMonthYearAreaColor = color }
 
-        fun monthYearSelectedAreaShape(shape: Shape) =
-            apply { this.monthYearSelectedAreaShape = shape }
+        fun selectedMonthYearAreaShape(shape: Shape) =
+            apply { this.selectedMonthYearAreaShape = shape }
 
         fun build(): DatePickerConfiguration {
             return DatePickerConfiguration(
-                height,
-                headerHeight,
-                headerTextStyle,
-                headerArrowSize,
-                headerArrowColor,
-                dateDaysTextStyle,
-                dateUnselectedTextStyle,
-                dateSelectedTextStyle,
-                dateSundayTextColor,
-                dateDisabledColor,
-                dateSelectedBackgroundSize,
-                dateSelectedBackgroundColor,
-                dateSelectedBackgroundShape,
-                monthYearUnselectedTextStyle,
-                monthYearSelectedTextStyle,
-                monthYearSelectedItemScaleFactor,
-                monthYearNumberOfRowsDisplayed,
-                monthYearSelectedAreaHeight,
-                monthYearSelectedAreaColor,
-                monthYearSelectedAreaShape
+                height = height,
+                headerHeight = headerHeight,
+                headerTextStyle = headerTextStyle,
+                headerArrowSize = headerArrowSize,
+                headerArrowColor = headerArrowColor,
+                daysNameTextStyle = daysNameTextStyle,
+                dateTextStyle = dateTextStyle,
+                selectedDateTextStyle = selectedDateTextStyle,
+                sundayTextColor = sundayTextColor,
+                disabledDateColor = disabledDateColor,
+                selectedDateBackgroundSize = selectedDateBackgroundSize,
+                selectedDateBackgroundColor = selectedDateBackgroundColor,
+                selectedDateBackgroundShape = selectedDateBackgroundShape,
+                monthYearTextStyle = monthYearTextStyle,
+                selectedMonthYearTextStyle = selectedMonthYearTextStyle,
+                selectedMonthYearScaleFactor = selectedMonthYearScaleFactor,
+                numberOfMonthYearRowsDisplayed = numberOfMonthYearRowsDisplayed,
+                selectedMonthYearAreaHeight = selectedMonthYearAreaHeight,
+                selectedMonthYearAreaColor = selectedMonthYearAreaColor,
+                selectedMonthYearAreaShape = selectedMonthYearAreaShape
             )
         }
     }

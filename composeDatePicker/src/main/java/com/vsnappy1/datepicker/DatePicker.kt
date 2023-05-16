@@ -98,7 +98,7 @@ fun DatePicker(
             onNextClick = { viewModel.moveToNextMonth() },
             onPreviousClick = { viewModel.moveToPreviousMonth() },
             isPreviousNextVisible = !uiState.isMonthYearViewVisible,
-            themeColor = configuration.dateSelectedBackgroundColor,
+            themeColor = configuration.selectedDateBackgroundColor,
             configuration = configuration,
         )
         Box(
@@ -167,10 +167,10 @@ private fun MonthAndYearView(
             modifier = modifier
                 .padding(horizontal = medium)
                 .fillMaxWidth()
-                .height(configuration.monthYearSelectedAreaHeight)
+                .height(configuration.selectedMonthYearAreaHeight)
                 .background(
-                    color = configuration.monthYearSelectedAreaColor,
-                    shape = configuration.monthYearSelectedAreaShape
+                    color = configuration.selectedMonthYearAreaColor,
+                    shape = configuration.selectedMonthYearAreaShape
                 )
         )
         Row(
@@ -218,11 +218,11 @@ private fun SwipeLazyColumn(
         onSelectedIndexChange = onSelectedIndexChange,
         isAutoScrolling = isAutoScrolling,
         height = height,
-        numberOfRowsDisplayed = configuration.monthYearNumberOfRowsDisplayed,
+        numberOfRowsDisplayed = configuration.numberOfMonthYearRowsDisplayed,
         listState = listState
     ) {
         // I add some empty rows at the beginning and end of list to make it feel that it is a center focused list
-        val count = items.size + configuration.monthYearNumberOfRowsDisplayed - 1
+        val count = items.size + configuration.numberOfMonthYearRowsDisplayed - 1
         items(count) {
             SliderItem(
                 value = it,
@@ -256,12 +256,12 @@ private fun SliderItem(
     height: Dp
 ) {
     // this gap variable helps in maintaining list as center focused list
-    val gap = configuration.monthYearNumberOfRowsDisplayed / 2
+    val gap = configuration.numberOfMonthYearRowsDisplayed / 2
     val isSelected = value == selectedIndex + gap
-    val scale by animateFloatAsState(targetValue = if (isSelected) configuration.monthYearSelectedItemScaleFactor else 1f)
+    val scale by animateFloatAsState(targetValue = if (isSelected) configuration.selectedMonthYearScaleFactor else 1f)
     Box(
         modifier = Modifier
-            .height(height / (configuration.monthYearNumberOfRowsDisplayed))
+            .height(height / (configuration.numberOfMonthYearRowsDisplayed))
     ) {
         if (value >= gap && value < items.size + gap) {
             Box(
@@ -272,10 +272,10 @@ private fun SliderItem(
                     },
                 contentAlignment = if (alignment == Alignment.CenterEnd) Alignment.CenterStart else Alignment.CenterEnd
             ) {
-                configuration.monthYearSelectedTextStyle.fontSize
+                configuration.selectedMonthYearTextStyle.fontSize
                 Box(
                     modifier = Modifier.width(
-                        configuration.monthYearSelectedTextStyle.fontSize.spToDp(LocalDensity.current) * 5
+                        configuration.selectedMonthYearTextStyle.fontSize.spToDp(LocalDensity.current) * 5
                     )
                 ) {
                     Text(
@@ -283,8 +283,8 @@ private fun SliderItem(
                         modifier = Modifier
                             .align(alignment)
                             .scale(scale),
-                        style = if (isSelected) configuration.monthYearSelectedTextStyle
-                        else configuration.monthYearUnselectedTextStyle
+                        style = if (isSelected) configuration.selectedMonthYearTextStyle
+                        else configuration.monthYearTextStyle
                     )
                 }
             }
@@ -319,8 +319,8 @@ private fun DateView(
         val topPaddingForItem =
             getTopPaddingForItem(
                 count,
-                height - configuration.dateSelectedBackgroundSize * 2, // because I don't want to count first two rows
-                configuration.dateSelectedBackgroundSize
+                height - configuration.selectedDateBackgroundSize * 2, // because I don't want to count first two rows
+                configuration.selectedDateBackgroundSize
             )
         items(count) {
             if (it < currentVisibleMonth.firstDayOfMonth.number - 1) return@items // to create empty boxes
@@ -366,22 +366,22 @@ private fun DateViewBodyItem(
         Box(
             contentAlignment = Alignment.Center, modifier = Modifier
                 .padding(top = if (value < 7) 0.dp else topPaddingForItem) // I don't want first row to have any padding
-                .size(configuration.dateSelectedBackgroundSize)
-                .clip(configuration.dateSelectedBackgroundShape)
+                .size(configuration.selectedDateBackgroundSize)
+                .clip(configuration.selectedDateBackgroundShape)
                 .noRippleClickable(enabled = isWithinRange) { onDaySelected(day) }
-                .background(if (isSelected) configuration.dateSelectedBackgroundColor else Color.Transparent)
+                .background(if (isSelected) configuration.selectedDateBackgroundColor else Color.Transparent)
         ) {
             Text(
                 text = "$day",
                 textAlign = TextAlign.Center,
-                style = if (isSelected) configuration.dateSelectedTextStyle
-                    .copy(color = if (isWithinRange) configuration.dateSelectedTextStyle.color else configuration.dateDisabledColor)
-                else configuration.dateUnselectedTextStyle.copy(
+                style = if (isSelected) configuration.selectedDateTextStyle
+                    .copy(color = if (isWithinRange) configuration.selectedDateTextStyle.color else configuration.disabledDateColor)
+                else configuration.dateTextStyle.copy(
                     color = if (isWithinRange) {
-                        if (value % 7 == 0) configuration.dateSundayTextColor
-                        else configuration.dateUnselectedTextStyle.color
+                        if (value % 7 == 0) configuration.sundayTextColor
+                        else configuration.dateTextStyle.color
                     } else {
-                        configuration.dateDisabledColor
+                        configuration.disabledDateColor
                     }
                 ),
             )
@@ -396,13 +396,13 @@ private fun DateViewHeaderItem(
 ) {
     Box(
         contentAlignment = Alignment.Center, modifier = Modifier
-            .size(configuration.dateSelectedBackgroundSize)
+            .size(configuration.selectedDateBackgroundSize)
     ) {
         Text(
             text = day.abbreviation,
             textAlign = TextAlign.Center,
-            style = configuration.dateDaysTextStyle.copy(
-                color = if (day.number == 1) configuration.dateSundayTextColor else configuration.dateDaysTextStyle.color
+            style = configuration.daysNameTextStyle.copy(
+                color = if (day.number == 1) configuration.sundayTextColor else configuration.daysNameTextStyle.color
             ),
         )
     }

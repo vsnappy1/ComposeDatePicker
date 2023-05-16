@@ -13,66 +13,66 @@ import com.vsnappy1.theme.grayLight
 
 class TimePickerConfiguration private constructor(
     val height: Dp,
-    val unselectedTextStyle: TextStyle,
-    val selectedTextStyle: TextStyle,
-    val scaleFactor: Float,
-    val numberOfRowsDisplayed: Int,
-    val selectedAreaHeight: Dp,
-    val selectedAreaColor: Color,
-    val selectedAreaShape: Shape
+    val timeTextStyle: TextStyle,
+    val selectedTimeTextStyle: TextStyle,
+    val numberOfTimeRowsDisplayed: Int,
+    val selectedTimeScaleFactor: Float,
+    val selectedTimeAreaHeight: Dp,
+    val selectedTimeAreaColor: Color,
+    val selectedTimeAreaShape: Shape
 ) {
     class Builder {
         private var height: Dp = 200.dp
-        private var unselectedTextStyle: TextStyle = TextStyle(
+        private var timeTextStyle: TextStyle = TextStyle(
             fontSize = 16.sp,
             fontWeight = FontWeight.W500,
             color = Color.Black.copy(alpha = 0.5f)
         )
-        private var selectedTextStyle: TextStyle = TextStyle(
+        private var selectedTimeTextStyle: TextStyle = TextStyle(
             fontSize = 17.sp,
             fontWeight = FontWeight.W600,
             color = Color.Black
         )
-        private var scaleFactor: Float = 1.2f
-        private var numberOfRowsDisplayed: Int = 7
-        private var selectedAreaHeight: Dp = 35.dp
-        private var selectedAreaColor: Color = grayLight.copy(alpha = 0.2f)
-        private var selectedAreaShape: Shape = RoundedCornerShape(Size.medium)
+        private var numberOfTimeRowsDisplayed: Int = 7
+        private var selectedTimeScaleFactor: Float = 1.2f
+        private var selectedTimeAreaHeight: Dp = 35.dp
+        private var selectedTimeAreaColor: Color = grayLight.copy(alpha = 0.2f)
+        private var selectedTimeAreaShape: Shape = RoundedCornerShape(Size.medium)
 
         fun height(height: Dp) =
             apply { this.height = height }
 
-        fun unselectedTextStyle(unselectedTextStyle: TextStyle) =
-            apply { this.unselectedTextStyle = unselectedTextStyle }
+        fun timeTextStyle(unselectedTextStyle: TextStyle) =
+            apply { this.timeTextStyle = unselectedTextStyle }
 
-        fun selectedTextStyle(selectedTextStyle: TextStyle) =
-            apply { this.selectedTextStyle = selectedTextStyle }
+        fun selectedTimeTextStyle(selectedTextStyle: TextStyle) =
+            apply { this.selectedTimeTextStyle = selectedTextStyle }
 
-        fun scaleFactor(scaleFactor: Float) =
-            apply { this.scaleFactor = scaleFactor }
+        fun selectedTimeScaleFactor(scaleFactor: Float) =
+            apply { this.selectedTimeScaleFactor = scaleFactor }
 
-        fun numberOfRowsDisplayed(numberOfRowsDisplayed: Int) =
-            apply { this.numberOfRowsDisplayed = numberOfRowsDisplayed }
+        fun numberOfTimeRowsDisplayed(numberOfRowsDisplayed: Int) =
+            apply { this.numberOfTimeRowsDisplayed = numberOfRowsDisplayed }
 
-        fun selectedAreaHeight(selectedAreaHeight: Dp) =
-            apply { this.selectedAreaHeight = selectedAreaHeight }
+        fun selectedTimeAreaHeight(selectedAreaHeight: Dp) =
+            apply { this.selectedTimeAreaHeight = selectedAreaHeight }
 
-        fun selectedAreaColor(selectedAreaColor: Color) =
-            apply { this.selectedAreaColor = selectedAreaColor }
+        fun selectedTimeAreaColor(selectedAreaColor: Color) =
+            apply { this.selectedTimeAreaColor = selectedAreaColor }
 
-        fun selectedAreaShape(selectedAreaShape: Shape) =
-            apply { this.selectedAreaShape = selectedAreaShape }
+        fun selectedTimeAreaShape(selectedAreaShape: Shape) =
+            apply { this.selectedTimeAreaShape = selectedAreaShape }
 
         fun build(): TimePickerConfiguration {
             return TimePickerConfiguration(
                 height = height,
-                unselectedTextStyle = unselectedTextStyle,
-                selectedTextStyle = selectedTextStyle,
-                scaleFactor = scaleFactor,
-                numberOfRowsDisplayed = numberOfRowsDisplayed,
-                selectedAreaHeight = selectedAreaHeight,
-                selectedAreaColor = selectedAreaColor,
-                selectedAreaShape = selectedAreaShape,
+                timeTextStyle = timeTextStyle,
+                selectedTimeTextStyle = selectedTimeTextStyle,
+                numberOfTimeRowsDisplayed = numberOfTimeRowsDisplayed,
+                selectedTimeScaleFactor = selectedTimeScaleFactor,
+                selectedTimeAreaHeight = selectedTimeAreaHeight,
+                selectedTimeAreaColor = selectedTimeAreaColor,
+                selectedTimeAreaShape = selectedTimeAreaShape,
             )
         }
     }
