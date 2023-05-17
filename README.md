@@ -21,23 +21,24 @@ dependencies {
 }
 ```
 
-
 ## Usage
 Adding a date picker or time picker is incredibly easy, requiring just two lines of code.
 
-For date picker
 ```kotlin
 DatePicker(onDateSelected = { year, month, day ->
     
 })
 ```
+![Screenshot_datepicker_1 (1)](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/740ec79f-d7d5-407b-9010-beab4774169e) -
+![Screenshot_datepicker_2](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/daa6f19f-be5b-46ab-8844-58b0e61c6545)
 
-For time picker
 ```kotlin
 TimePicker(onTimeSelected = { hour, minute, timeOfDay ->
 
 })
 ```
+![Screenshot_timepicker](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/de0373a3-f7f6-42bd-9f4f-0a221ca68d98)
+
 
 ## Customization
 The date and time picker offer extensive customization options, allowing users to modify the 
@@ -53,7 +54,7 @@ DatePicker(
     date = ComposeDatePickerDate(year = 2023, month = 0, day = 5)
 )
 ```
-Please note that the *year* should be within a range of <current_year> ± 100 (inclusive). Additionally, for the *month*, 
+Please note that the **_year_** should be within a range of <current_year> ± 100 (inclusive). Additionally, for the **_month_**, 
 please keep in mind that 0 represents January, while 11 corresponds to December.
 
 #### Set Selection Limit
@@ -82,7 +83,7 @@ DatePicker(
         .build()
 )
 ```
-In addition to dateTextStyle, selectedDateTextStyle, and selectedDateBackgroundColor, there are a total of 
+In addition to **_dateTextStyle_**, **_selectedDateTextStyle_**, and **_selectedDateBackgroundColor_**, there are a total of 
 20 attributes available for users to customize the appearance of the date picker.
 
 <br>
@@ -111,7 +112,7 @@ TimePicker(
     minuteGap = MinuteGap.ONE
 )
 ```
-The *minuteGap* parameter determines the interval between consecutive items in the list. 
+The **_minuteGap_** parameter determines the interval between consecutive items in the list. 
 For example, if set to MinuteGap.FIVE, the minutes in the time picker will be displayed in the order 00, 05, 10,..., 60.
 
 
@@ -130,3 +131,10 @@ TimePicker(
 )
 ```
 There are a total of 8 attributes available for users to customize the appearance of the time picker.
+
+
+## Troubleshot
+
+* If multiple date/time pickers are used, a unique **_id_** parameter should be included in the function call for each composable.
+
+* When adjusting the height of a date/time picker, it is recommended to use **_TimePickerConfiguration.Builder().height()_** instead of **_Modifier.height()_** to ensure smooth rendering.
