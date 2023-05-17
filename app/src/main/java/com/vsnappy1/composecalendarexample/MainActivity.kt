@@ -17,6 +17,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.vsnappy1.composecalendarexample.ui.theme.ComposeCalendarExampleTheme
 import com.vsnappy1.datepicker.DatePicker
+import com.vsnappy1.datepicker.data.DefaultDatePickerConfig
 import com.vsnappy1.datepicker.data.model.ComposeDatePickerDate
 import com.vsnappy1.datepicker.data.model.SelectionLimiter
 import com.vsnappy1.datepicker.ui.model.DatePickerConfiguration
@@ -47,10 +48,11 @@ class MainActivity : ComponentActivity() {
                                 .build()
                         )
 
-                        TimePicker(modifier = Modifier.padding(16.dp),
-                            onTimeSelected = { hour, minute, timeOfDay ->
-                                Log.d(TAG, "Time: $hour : $minute $timeOfDay")
-                            }
+                        DatePicker(
+                            modifier = Modifier.padding(16.dp),
+                            onDateSelected = { year, month, day ->
+                            },
+                            id = 2
                         )
                     }
                 }

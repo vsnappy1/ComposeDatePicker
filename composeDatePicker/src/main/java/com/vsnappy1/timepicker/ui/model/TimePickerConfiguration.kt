@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vsnappy1.theme.Size
 import com.vsnappy1.theme.grayLight
+import com.vsnappy1.timepicker.data.DefaultTimePickerConfig
 
 class TimePickerConfiguration private constructor(
     val height: Dp,
@@ -22,22 +23,15 @@ class TimePickerConfiguration private constructor(
     val selectedTimeAreaShape: Shape
 ) {
     class Builder {
-        private var height: Dp = 200.dp
-        private var timeTextStyle: TextStyle = TextStyle(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.W500,
-            color = Color.Black.copy(alpha = 0.5f)
-        )
-        private var selectedTimeTextStyle: TextStyle = TextStyle(
-            fontSize = 17.sp,
-            fontWeight = FontWeight.W600,
-            color = Color.Black
-        )
-        private var numberOfTimeRowsDisplayed: Int = 7
-        private var selectedTimeScaleFactor: Float = 1.2f
-        private var selectedTimeAreaHeight: Dp = 35.dp
-        private var selectedTimeAreaColor: Color = grayLight.copy(alpha = 0.2f)
-        private var selectedTimeAreaShape: Shape = RoundedCornerShape(Size.medium)
+        private var height: Dp = DefaultTimePickerConfig.height
+        private var timeTextStyle: TextStyle = DefaultTimePickerConfig.timeTextStyle
+        private var selectedTimeTextStyle: TextStyle = DefaultTimePickerConfig.selectedTimeTextStyle
+        private var numberOfTimeRowsDisplayed: Int =
+            DefaultTimePickerConfig.numberOfTimeRowsDisplayed
+        private var selectedTimeScaleFactor: Float = DefaultTimePickerConfig.selectedTimeScaleFactor
+        private var selectedTimeAreaHeight: Dp = DefaultTimePickerConfig.selectedTimeAreaHeight
+        private var selectedTimeAreaColor: Color = DefaultTimePickerConfig.selectedTimeAreaColor
+        private var selectedTimeAreaShape: Shape = DefaultTimePickerConfig.selectedTimeAreaShape
 
         fun height(height: Dp) =
             apply { this.height = height }

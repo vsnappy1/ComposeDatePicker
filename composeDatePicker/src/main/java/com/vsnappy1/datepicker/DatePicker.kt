@@ -61,6 +61,7 @@ import com.vsnappy1.extension.toDp
 import com.vsnappy1.theme.Size.medium
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
+import kotlin.random.Random
 
 
 @Composable
@@ -69,9 +70,10 @@ fun DatePicker(
     onDateSelected: (Int, Int, Int) -> Unit,
     date: ComposeDatePickerDate = DefaultDate.defaultDate,
     selectionLimiter: SelectionLimiter = SelectionLimiter(),
-    configuration: DatePickerConfiguration = DatePickerConfiguration.Builder().build()
+    configuration: DatePickerConfiguration = DatePickerConfiguration.Builder().build(),
+    id: Int = 1
 ) {
-    val viewModel: DatePickerViewModel = viewModel()
+    val viewModel: DatePickerViewModel = viewModel(key = "DatePickerViewModel$id")
 
     var height by remember { mutableStateOf(configuration.height) }
 

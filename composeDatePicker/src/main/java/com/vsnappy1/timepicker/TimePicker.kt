@@ -49,8 +49,9 @@ fun TimePicker(
     minuteGap: MinuteGap = MinuteGap.FIVE,
     time: ComposeTimePickerTime? = null, // This has more priority in terms of is24Hour
     configuration: TimePickerConfiguration = TimePickerConfiguration.Builder().build(),
+    id: Int = 1
 ) {
-    val viewModel: TimePickerViewModel = viewModel()
+    val viewModel: TimePickerViewModel = viewModel(key = "TimePickerViewModel$id")
     val timePickerTime = time ?: DefaultTime.getTime(LocalContext.current, minuteGap, is24Hour)
     val timePickerUiState = viewModel.getUiStateTimeProvided(timePickerTime, minuteGap)
     LaunchedEffect(key1 = Unit) { viewModel.updateUiState(timePickerTime, minuteGap) }
