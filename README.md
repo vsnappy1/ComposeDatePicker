@@ -43,8 +43,6 @@ TimePicker(onTimeSelected = { hour, minute, timeOfDay ->
 The date and time picker offer extensive customization options, allowing users to modify the 
 TextStyle, Color, Size, Shape, and other elements to align with their preferred theme.
 
-<br>
-
 ### Date Picker
 ___
 #### Set Custom Date
