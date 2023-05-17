@@ -52,7 +52,7 @@ internal object Constant {
     private fun findMinutes(minuteGap: MinuteGap): List<String> {
         var value = 0
         val list = mutableListOf<String>()
-        while (value <= 60) {
+        while (value < 60) {
             list.add("${if (value < 10) "0" else ""}${value}")
             value += minuteGap.gap
         }

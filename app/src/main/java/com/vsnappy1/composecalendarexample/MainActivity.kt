@@ -2,6 +2,7 @@ package com.vsnappy1.composecalendarexample
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -22,6 +23,7 @@ import com.vsnappy1.datepicker.data.model.ComposeDatePickerDate
 import com.vsnappy1.datepicker.data.model.SelectionLimiter
 import com.vsnappy1.datepicker.ui.model.DatePickerConfiguration
 import com.vsnappy1.timepicker.TimePicker
+import com.vsnappy1.timepicker.enums.MinuteGap
 import com.vsnappy1.timepicker.ui.model.TimePickerConfiguration
 
 private const val TAG = "MainActivity"
@@ -40,20 +42,13 @@ class MainActivity : ComponentActivity() {
                         DatePicker(
                             modifier = Modifier.padding(16.dp),
                             onDateSelected = { year, month, day ->
-                            },
-                            configuration = DatePickerConfiguration.Builder()
-                                .height(height = 300.dp)
-                                .dateTextStyle(textStyle = TextStyle(Color.Black.copy(alpha = 0.5f)))
-                                .selectedDateTextStyle(textStyle = TextStyle(Color.Black))
-                                .build()
+                                Toast.makeText(this@MainActivity, "$year", Toast.LENGTH_SHORT).show()
+                            }
                         )
+                        TimePicker(onTimeSelected = { hour, minute, timeOfDay ->
 
-                        DatePicker(
-                            modifier = Modifier.padding(16.dp),
-                            onDateSelected = { year, month, day ->
-                            },
-                            id = 2
-                        )
+                        },
+                        minuteGap = MinuteGap.ONE)
                     }
                 }
             }

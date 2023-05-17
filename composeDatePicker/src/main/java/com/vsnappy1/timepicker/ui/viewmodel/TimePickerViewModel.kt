@@ -61,7 +61,7 @@ internal class TimePickerViewModel : ViewModel() {
             if (timePickerTime.hour < 0 || timePickerTime.hour > 23) {
                 throw IllegalArgumentException("Invalid hour: ${timePickerTime.hour}, The hour value must be between 0 and 23 inclusive.")
             }
-            if (timePickerTime.minute < 0 || timePickerTime.minute > 60) {
+            if (timePickerTime.minute < 0 || timePickerTime.minute >= 60) {
                 throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, The minute value must be between 0 and 60 inclusive.")
             }
             if (timePickerTime.minute % minuteGap.gap != 0) {
@@ -74,7 +74,7 @@ internal class TimePickerViewModel : ViewModel() {
             if (timePickerTime.hour < 1 || timePickerTime.hour > 12) {
                 throw IllegalArgumentException("Invalid hour: ${timePickerTime.hour}, The hour value must be between 1 and 12 inclusive.")
             }
-            if (timePickerTime.minute < 0 || timePickerTime.minute > 60) {
+            if (timePickerTime.minute < 0 || timePickerTime.minute >= 60) {
                 throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, The minute value must be between 0 and 60 inclusive.")
             }
             if (timePickerTime.minute % minuteGap.gap != 0) {

@@ -1,5 +1,6 @@
 package com.vsnappy1.datepicker
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -25,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -77,11 +79,6 @@ fun DatePicker(
 
     var height by remember { mutableStateOf(configuration.height) }
 
-    // Key is Unit because I want this to run only once not every time when is composable is recomposed.
-    LaunchedEffect(key1 = Unit) {
-        viewModel.setDate(date)
-    }
-
     val uiState by viewModel.uiState.observeAsState(
         DatePickerUiState(
             selectedYear = date.year,
@@ -89,6 +86,17 @@ fun DatePicker(
             selectedDayOfMonth = date.day
         )
     )
+
+    // Key is Unit because I want this to run only once not every time when is composable is recomposed.
+    LaunchedEffect(key1 = Unit) {
+        viewModel.setDate(date)
+        onDateSelected(
+            uiState.selectedYear,
+            uiState.selectedMonth.number,
+            uiState.selectedDayOfMonth
+        )
+    }
+
     Box(modifier = modifier.onGloballyPositioned {
         if (it.size.height == 0) return@onGloballyPositioned
         height = it.size.height.toDp() - configuration.headerHeight// Update the height
