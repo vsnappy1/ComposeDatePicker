@@ -1,6 +1,8 @@
 # ComposeDatePicker
 An Android Jetpack Compose library that provides a Date & Time Picker functionality.
 
+[![](https://jitpack.io/v/vsnappy1/ComposeDatePicker.svg)](https://jitpack.io/#vsnappy1/ComposeDatePicker)
+
 ## Setup
 Step 1. Add the JitPack repository to your build file (Add it in your root build.gradle at the end of repositories)
 ```kotlin
@@ -15,9 +17,10 @@ Step 2. Add the dependency
 ```kotlin
 dependencies {
     ..
-    implementation 'com.github.vsnappy1:ComposeDatePicker:1.2.1'
+    implementation 'com.github.vsnappy1:ComposeDatePicker:1.2.2'
 }
 ```
+
 
 ## Usage
 Adding a date picker or time picker is incredibly easy, requiring just two lines of code.
@@ -40,6 +43,7 @@ TimePicker(onTimeSelected = { hour, minute, timeOfDay ->
 The date and time picker offer extensive customization options, allowing users to modify the 
 TextStyle, Color, Size, Shape, and other elements to align with their preferred theme.
 
+<br>
 
 ### Date Picker
 ___
@@ -74,7 +78,7 @@ DatePicker(
     },
     configuration = DatePickerConfiguration.Builder()
         .height(height = 300.dp)
-        .dateTextStyle(textStyle = TextStyle(Color(0xFF333333)))
+        .dateTextStyle(DefaultDatePickerConfig.dateTextStyle.copy(color = Color(0xFF333333)))
         .selectedDateTextStyle(textStyle = TextStyle(Color(0xFFFFFFFF)))
         .selectedDateBackgroundColor(color = Color(0xFF64DD17))
         .build()
@@ -82,7 +86,9 @@ DatePicker(
 ```
 In addition to dateTextStyle, selectedDateTextStyle, and selectedDateBackgroundColor, there are a total of 
 20 attributes available for users to customize the appearance of the date picker.
-<br><br><br>
+
+<br>
+
 ### Time Picker
 ___
 #### Set Custom Time
