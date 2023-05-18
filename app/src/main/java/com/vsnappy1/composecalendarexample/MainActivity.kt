@@ -41,8 +41,7 @@ class MainActivity : ComponentActivity() {
                                     "$hour : $minute $timeOfDay",
                                     Toast.LENGTH_SHORT
                                 ).show()
-                            },
-                            minuteGap = MinuteGap.ONE
+                            }
                         )
                     }
                 }
