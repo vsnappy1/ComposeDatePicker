@@ -80,6 +80,8 @@ fun TimePicker(
         is24Hour = uiState.is24Hour,
         configuration = configuration
     )
+    LaunchedEffect(key1 = Unit) { viewModel.getSelectedTime()?.trigger(onTimeSelected) }
+
 }
 
 private fun ComposeTimePickerTime.trigger(onTimeSelected: (Int, Int, TimeOfDay?) -> Unit) {
@@ -198,7 +200,6 @@ private fun SwipeLazyColumn(
                 textAlign = textAlign,
                 height = height,
                 onItemClick = { index ->
-                    onSelectedIndexChange(index)
                     coroutineScope.launch {
                         isAutoScrolling = true
                         onSelectedIndexChange(index)

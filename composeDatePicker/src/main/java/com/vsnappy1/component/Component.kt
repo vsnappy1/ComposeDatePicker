@@ -53,10 +53,11 @@ fun SwipeLazyColumn(
 
     LaunchedEffect(key1 = Unit) {
         listState.scrollToItem(selectedIndex)
+        delay(10)
         isInitialScrollingDone = true
     }
-    if (!isAutoScrolling && isInitialScrollingDone) {
-        LaunchedEffect(key1 = listState.firstVisibleItemScrollOffset) {
+    LaunchedEffect(key1 = listState.firstVisibleItemScrollOffset) {
+        if (!isAutoScrolling && isInitialScrollingDone) {
             val index =
                 listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > height.value / numberOfRowsDisplayed) 1 else 0
             onSelectedIndexChange(index)

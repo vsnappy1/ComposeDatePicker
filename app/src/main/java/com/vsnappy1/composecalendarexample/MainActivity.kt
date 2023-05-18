@@ -30,8 +30,8 @@ class MainActivity : ComponentActivity() {
                         DatePicker(
                             modifier = Modifier.padding(16.dp),
                             onDateSelected = { year, month, day ->
-                                Toast.makeText(this@MainActivity, "$year/$month/$year", Toast.LENGTH_SHORT)
-                                    .show()
+//                                Toast.makeText(this@MainActivity, "$year/$month/$day", Toast.LENGTH_SHORT)
+//                                    .show()
                             }
                         )
                         TimePicker(
