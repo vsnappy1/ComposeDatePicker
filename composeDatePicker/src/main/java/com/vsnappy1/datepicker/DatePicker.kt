@@ -77,7 +77,8 @@ fun DatePicker(
 ) {
     val viewModel: DatePickerViewModel = viewModel(key = "DatePickerViewModel$id")
 
-    var height by remember { mutableStateOf(configuration.height) }
+    // Key is Unit because I want this to run only once not every time when is composable is recomposed.
+    LaunchedEffect(key1 = Unit) { viewModel.setDate(date) }
 
     val uiState by viewModel.uiState.observeAsState(
         DatePickerUiState(
@@ -87,16 +88,7 @@ fun DatePicker(
         )
     )
 
-    // Key is Unit because I want this to run only once not every time when is composable is recomposed.
-    LaunchedEffect(key1 = Unit) {
-        viewModel.setDate(date)
-        onDateSelected(
-            uiState.selectedYear,
-            uiState.selectedMonth.number,
-            uiState.selectedDayOfMonth
-        )
-    }
-
+    var height by remember { mutableStateOf(configuration.height) }
     Box(modifier = modifier.onGloballyPositioned {
         if (it.size.height == 0) return@onGloballyPositioned
         height = it.size.height.toDp() - configuration.headerHeight// Update the height
@@ -153,6 +145,14 @@ fun DatePicker(
                 )
             }
         }
+    }
+    // Call onDateSelected when composition is completed
+    LaunchedEffect(key1 = Unit) {
+        onDateSelected(
+            uiState.selectedYear,
+            uiState.selectedMonth.number,
+            uiState.selectedDayOfMonth
+        )
     }
 }
 

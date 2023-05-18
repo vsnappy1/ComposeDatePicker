@@ -1,7 +1,6 @@
 package com.vsnappy1.timepicker.ui.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.vsnappy1.timepicker.data.Constant
 import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
 import com.vsnappy1.timepicker.enums.MinuteGap
 import com.vsnappy1.timepicker.enums.TimeOfDay
@@ -53,7 +52,7 @@ class TimePickerViewModelTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs24HourClockAndMinuteIsMoreThan60_shouldThrowException() {
+    fun getUiStateTimeProvided_when_itIs24HourClockAndMinuteIsMoreThan59_shouldThrowException() {
         //Given
         val time = ComposeTimePickerTime.TwentyFourHourTime(12, 61)
 
@@ -98,7 +97,7 @@ class TimePickerViewModelTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs12HourClockAndMinuteIsMoreThan60_shouldThrowException() {
+    fun getUiStateTimeProvided_when_itIs12HourClockAndMinuteIsMoreThan59_shouldThrowException() {
         //Given
         val time = ComposeTimePickerTime.TwelveHourTime(12, 61, TimeOfDay.AM)
 
@@ -118,7 +117,7 @@ class TimePickerViewModelTest {
     @Test
     fun getUiStateTimeProvided_when_itIsAValid12HourClock_shouldUpdateTheUiStateAccordingly() {
         //Given
-        val time = ComposeTimePickerTime.TwelveHourTime(12, 35, TimeOfDay.AM)
+        val time = ComposeTimePickerTime.TwelveHourTime(12, 55, TimeOfDay.AM)
 
         //When
         viewModel.updateUiState(time, MinuteGap.FIVE)
@@ -126,7 +125,7 @@ class TimePickerViewModelTest {
         //Then
         (viewModel.getSelectedTime() as ComposeTimePickerTime.TwelveHourTime).let {
             assertEquals(12, it.hour)
-            assertEquals(35, it.minute)
+            assertEquals(55, it.minute)
             assertEquals(TimeOfDay.AM, it.timeOfDay)
         }
     }

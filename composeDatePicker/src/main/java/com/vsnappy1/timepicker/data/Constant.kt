@@ -68,9 +68,9 @@ internal object Constant {
     }
 
     fun getMiddleOfMinute(minuteGap: MinuteGap): Int {
-        return if (minuteGap.gap == 1) 61 * (repeatCount / 2)
-        else if (minuteGap == MinuteGap.FIVE) 13 * (repeatCount / 2)
-        else 7 * (repeatCount / 2)
+        return if (minuteGap.gap == 1) 60 * (repeatCount / 2)
+        else if (minuteGap == MinuteGap.FIVE) 12 * (repeatCount / 2)
+        else 6 * (repeatCount / 2)
     }
 
     fun getNearestNextMinute(minute: Int, minuteGap: MinuteGap): Int {
@@ -79,7 +79,7 @@ internal object Constant {
         while (value < minute) {
             value += minuteGap.gap
         }
-        return if (value > 60) 0
+        return if (value >= 60) 0
         else value
     }
 

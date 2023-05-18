@@ -61,11 +61,11 @@ internal class TimePickerViewModel : ViewModel() {
             if (timePickerTime.hour < 0 || timePickerTime.hour > 23) {
                 throw IllegalArgumentException("Invalid hour: ${timePickerTime.hour}, The hour value must be between 0 and 23 inclusive.")
             }
-            if (timePickerTime.minute < 0 || timePickerTime.minute >= 60) {
-                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, The minute value must be between 0 and 60 inclusive.")
+            if (timePickerTime.minute < 0 || timePickerTime.minute > 59) {
+                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, The minute value must be between 0 and 59 inclusive.")
             }
             if (timePickerTime.minute % minuteGap.gap != 0) {
-                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, Since minute gap is ${minuteGap.gap} the minute value must be multiple of ${minuteGap.gap} & between 0 and 60 inclusive. If you want some other value (e.g. 1,2,3....60) please change minuteGap attribute to MinuteGap.ONE.")
+                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, Since minute gap is ${minuteGap.gap} the minute value must be multiple of ${minuteGap.gap} & between 0 and 59 inclusive. If you want some other value (e.g. 1,2,3....59) please change minuteGap attribute to MinuteGap.ONE.")
             }
             hour = timePickerTime.hour
             minute = timePickerTime.minute
@@ -74,11 +74,11 @@ internal class TimePickerViewModel : ViewModel() {
             if (timePickerTime.hour < 1 || timePickerTime.hour > 12) {
                 throw IllegalArgumentException("Invalid hour: ${timePickerTime.hour}, The hour value must be between 1 and 12 inclusive.")
             }
-            if (timePickerTime.minute < 0 || timePickerTime.minute >= 60) {
-                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, The minute value must be between 0 and 60 inclusive.")
+            if (timePickerTime.minute < 0 || timePickerTime.minute > 59) {
+                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, The minute value must be between 0 and 59 inclusive.")
             }
             if (timePickerTime.minute % minuteGap.gap != 0) {
-                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, Since minute gap is ${minuteGap.gap} the minute value must be multiple of ${minuteGap.gap} & between 0 and 60 inclusive. If you want some other value (e.g. 1,2,3....60) please change minuteGap attribute to MinuteGap.ONE.")
+                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, Since minute gap is ${minuteGap.gap} the minute value must be multiple of ${minuteGap.gap} & between 0 and 59 inclusive. If you want some other value (e.g. 1,2,3....59) please change minuteGap attribute to MinuteGap.ONE.")
             }
             hour = timePickerTime.hour
             minute = timePickerTime.minute
