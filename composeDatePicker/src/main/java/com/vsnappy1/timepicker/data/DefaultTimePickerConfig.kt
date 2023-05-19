@@ -25,8 +25,8 @@ class DefaultTimePickerConfig private constructor() {
             fontWeight = FontWeight.W600,
             color = Color.Black
         )
-        val numberOfTimeRowsDisplayed: Int = 7
-        val selectedTimeScaleFactor: Float = 1.2f
+        const val numberOfTimeRowsDisplayed: Int = 7
+        const val selectedTimeScaleFactor: Float = 1.2f
         val selectedTimeAreaHeight: Dp = 35.dp
         val selectedTimeAreaColor: Color = grayLight.copy(alpha = 0.2f)
         val selectedTimeAreaShape: Shape = RoundedCornerShape(Size.medium)

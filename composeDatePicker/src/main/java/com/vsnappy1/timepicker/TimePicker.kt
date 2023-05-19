@@ -1,5 +1,6 @@
 package com.vsnappy1.timepicker
 
+import android.text.format.DateFormat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,9 +35,7 @@ import com.vsnappy1.extension.toDp
 import com.vsnappy1.theme.Size.extraLarge
 import com.vsnappy1.theme.Size.medium
 import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
-import com.vsnappy1.timepicker.data.model.DefaultTime
 import com.vsnappy1.timepicker.enums.MinuteGap
-import com.vsnappy1.timepicker.enums.TimeOfDay
 import com.vsnappy1.timepicker.ui.model.TimePickerConfiguration
 import com.vsnappy1.timepicker.ui.viewmodel.TimePickerViewModel
 import kotlinx.coroutines.launch
@@ -44,17 +43,18 @@ import kotlinx.coroutines.launch
 @Composable
 fun TimePicker(
     modifier: Modifier = Modifier,
-    onTimeSelected: (Int, Int, TimeOfDay?) -> Unit,
+    onTimeSelected: (Int, Int) -> Unit,
     is24Hour: Boolean? = null,
-    minuteGap: MinuteGap = MinuteGap.FIVE,
-    time: ComposeTimePickerTime? = null, // This has more priority in terms of is24Hour
+    minuteGap: MinuteGap = MinuteGap.ONE,
+    time: ComposeTimePickerTime? = null,
     configuration: TimePickerConfiguration = TimePickerConfiguration.Builder().build(),
     id: Int = 1
 ) {
     val viewModel: TimePickerViewModel = viewModel(key = "TimePickerViewModel$id")
-    val timePickerTime = time ?: DefaultTime.getTime(LocalContext.current, minuteGap, is24Hour)
-    val timePickerUiState = viewModel.getUiStateTimeProvided(timePickerTime, minuteGap)
-    LaunchedEffect(key1 = Unit) { viewModel.updateUiState(timePickerTime, minuteGap) }
+    val timePickerTime = time ?: ComposeTimePickerTime.getTime(minuteGap)
+    val is24: Boolean = is24Hour ?: DateFormat.is24HourFormat(LocalContext.current)
+    val timePickerUiState = viewModel.getUiStateTimeProvided(timePickerTime, minuteGap, is24)
+    LaunchedEffect(key1 = Unit) { viewModel.updateUiState(timePickerTime, minuteGap, is24) }
     val uiState by viewModel.uiState.observeAsState(timePickerUiState)
 
     TimePickerView(
@@ -63,33 +63,34 @@ fun TimePicker(
         selectedHourIndex = uiState.selectedHourIndex,
         onSelectedHourIndexChange = {
             viewModel.updateSelectedHourIndex(it)
-            viewModel.getSelectedTime()?.trigger(onTimeSelected)
+            viewModel.getSelectedTime()?.apply {
+                onTimeSelected(hour, minute)
+            }
         },
         minutes = uiState.minutes,
         selectedMinuteIndex = uiState.selectedMinuteIndex,
         onSelectedMinuteIndexChange = {
             viewModel.updateSelectedMinuteIndex(it)
-            viewModel.getSelectedTime()?.trigger(onTimeSelected)
+            viewModel.getSelectedTime()?.apply {
+                onTimeSelected(hour, minute)
+            }
         },
         timesOfDay = uiState.timesOfDay,
         selectedTimeOfDayIndex = uiState.selectedTimeOfDayIndex,
         onSelectedTimeOfDayIndexChange = {
             viewModel.updateSelectedTimeOfDayIndex(it)
-            viewModel.getSelectedTime()?.trigger(onTimeSelected)
+            viewModel.getSelectedTime()?.apply {
+                onTimeSelected(hour, minute)
+            }
         },
         is24Hour = uiState.is24Hour,
         configuration = configuration
     )
     LaunchedEffect(key1 = Unit) { viewModel.getSelectedTime()?.trigger(onTimeSelected) }
-
 }
 
-private fun ComposeTimePickerTime.trigger(onTimeSelected: (Int, Int, TimeOfDay?) -> Unit) {
-    if (this is ComposeTimePickerTime.TwentyFourHourTime) {
-        onTimeSelected(hour, minute, null)
-    } else if (this is ComposeTimePickerTime.TwelveHourTime) {
-        onTimeSelected(hour, minute, timeOfDay)
-    }
+private fun ComposeTimePickerTime.trigger(onTimeSelected: (Int, Int) -> Unit) {
+    onTimeSelected(hour, minute)
 }
 
 @Composable
@@ -158,7 +159,8 @@ private fun TimePickerView(
                     items = timesOfDay,
                     alignment = Alignment.CenterStart,
                     configuration = configuration,
-                    height = height
+                    height = height,
+                    isScrollingToSelectedItemEnabled = true
                 )
             }
         }
@@ -174,6 +176,7 @@ private fun SwipeLazyColumn(
     textAlign: TextAlign = TextAlign.End,
     alignment: Alignment = Alignment.CenterStart,
     configuration: TimePickerConfiguration,
+    isScrollingToSelectedItemEnabled: Boolean = false,
     height: Dp
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -185,6 +188,7 @@ private fun SwipeLazyColumn(
         onSelectedIndexChange = onSelectedIndexChange,
         isAutoScrolling = isAutoScrolling,
         height = height,
+        isScrollingToSelectedItemEnabled = isScrollingToSelectedItemEnabled,
         numberOfRowsDisplayed = configuration.numberOfTimeRowsDisplayed,
         listState = listState
     ) {
@@ -257,5 +261,5 @@ private fun SliderItem(
 @Preview
 @Composable
 fun PreviewTimePicker() {
-    TimePicker(onTimeSelected = { _: Int, _: Int, _: TimeOfDay? -> })
+    TimePicker(onTimeSelected = { _: Int, _: Int -> })
 }

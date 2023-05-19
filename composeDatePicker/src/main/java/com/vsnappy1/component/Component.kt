@@ -1,7 +1,6 @@
 package com.vsnappy1.component
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.tween
@@ -28,8 +27,8 @@ fun AnimatedFadeVisibility(
 ) {
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn(animationSpec = tween(durationMillis = 400, delayMillis = 100)),
-        exit = fadeOut(animationSpec = tween(durationMillis = 250))
+        enter = fadeIn(animationSpec = tween(durationMillis = 400, delayMillis = 200)),
+        exit = fadeOut(animationSpec = tween(durationMillis = 250, delayMillis = 100))
     ) {
         content()
     }
@@ -44,12 +43,23 @@ fun SwipeLazyColumn(
     onSelectedIndexChange: (Int) -> Unit,
     height: Dp,
     isAutoScrolling: Boolean,
+    isScrollingToSelectedItemEnabled: Boolean = false,
     numberOfRowsDisplayed: Int,
     listState: LazyListState,
     content: LazyListScope.() -> Unit
 ) {
     var lastSelectedIndex by remember { mutableStateOf(0) }
     var isInitialScrollingDone by remember { mutableStateOf(false) }
+
+    if (isScrollingToSelectedItemEnabled) {
+        LaunchedEffect(key1 = selectedIndex) {
+            isInitialScrollingDone = false
+            delay(200)
+            listState.animateScrollToItem(selectedIndex)
+            delay(10)
+            isInitialScrollingDone = true
+        }
+    }
 
     LaunchedEffect(key1 = Unit) {
         listState.scrollToItem(selectedIndex)

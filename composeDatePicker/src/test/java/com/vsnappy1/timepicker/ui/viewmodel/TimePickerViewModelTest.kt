@@ -3,7 +3,6 @@ package com.vsnappy1.timepicker.ui.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
 import com.vsnappy1.timepicker.enums.MinuteGap
-import com.vsnappy1.timepicker.enums.TimeOfDay
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -25,125 +24,123 @@ class TimePickerViewModelTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs24HourClockAndHourIsLessThanZero_shouldThrowException() {
+    fun getUiStateTimeProvided_when_hourIsLessThanZero_shouldThrowException() {
         //Given
-        val time = ComposeTimePickerTime.TwentyFourHourTime(-1, 45)
+        val time = ComposeTimePickerTime(-1, 45)
 
         //When
-        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE)
+        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE, true)
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs24HourClockAndHourIsMoreThan23_shouldThrowException() {
+    fun getUiStateTimeProvided_when_hourIsMoreThan23_shouldThrowException() {
         //Given
-        val time = ComposeTimePickerTime.TwentyFourHourTime(24, 45)
+        val time = ComposeTimePickerTime(24, 45)
 
         //When
-        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE)
+        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE, true)
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs24HourClockAndMinuteIsLessThanZero_shouldThrowException() {
+    fun getUiStateTimeProvided_when_minuteIsLessThanZero_shouldThrowException() {
         //Given
-        val time = ComposeTimePickerTime.TwentyFourHourTime(12, -1)
+        val time = ComposeTimePickerTime(12, -1)
 
         //When
-        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE)
+        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE, true)
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs24HourClockAndMinuteIsMoreThan59_shouldThrowException() {
+    fun getUiStateTimeProvided_when_minuteIsMoreThan59_shouldThrowException() {
         //Given
-        val time = ComposeTimePickerTime.TwentyFourHourTime(12, 61)
+        val time = ComposeTimePickerTime(12, 60)
 
         //When
-        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE)
+        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE, true)
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs24HourClockAndMinuteIsNotMultipleOfGivenMinuteGap_shouldThrowException() {
+
+    @Test
+    fun getUiStateTimeProvided_when_is24HourIsFalse_shouldUpdateTheUiStateAccordingly() {
         //Given
-        val time = ComposeTimePickerTime.TwentyFourHourTime(12, 27)
+        val time = ComposeTimePickerTime(20, 55)
 
         //When
-        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE)
-    }
+        viewModel.updateUiState(time, MinuteGap.FIVE, false)
 
-    @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs12HourClockAndHourIsLessThanZero_shouldThrowException() {
-        //Given
-        val time = ComposeTimePickerTime.TwelveHourTime(-1, 45, TimeOfDay.AM)
-
-        //When
-        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE)
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs12HourClockAndHourIsMoreThan12_shouldThrowException() {
-        //Given
-        val time = ComposeTimePickerTime.TwelveHourTime(13, 45, TimeOfDay.AM)
-
-        //When
-        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE)
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs12HourClockAndMinuteIsLessThanZero_shouldThrowException() {
-        //Given
-        val time = ComposeTimePickerTime.TwelveHourTime(12, -1, TimeOfDay.AM)
-
-        //When
-        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE)
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs12HourClockAndMinuteIsMoreThan59_shouldThrowException() {
-        //Given
-        val time = ComposeTimePickerTime.TwelveHourTime(12, 61, TimeOfDay.AM)
-
-        //When
-        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE)
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun getUiStateTimeProvided_when_itIs12HourClockAndMinuteIsNotMultipleOfGivenMinuteGap_shouldThrowException() {
-        //Given
-        val time = ComposeTimePickerTime.TwelveHourTime(12, 27, TimeOfDay.AM)
-
-        //When
-        viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE)
+        //Then
+        viewModel.uiState.value?.let {
+            val hour = it.hours[it.selectedHourIndex].toInt()
+            val minute = it.minutes[it.selectedMinuteIndex].toInt()
+            assertEquals(8, hour)
+            assertEquals(55, minute)
+            assertEquals(1, it.selectedTimeOfDayIndex)
+        }
     }
 
     @Test
-    fun getUiStateTimeProvided_when_itIsAValid12HourClock_shouldUpdateTheUiStateAccordingly() {
+    fun getUiStateTimeProvided_when_is24HourIsTrue_shouldUpdateTheUiStateAccordingly() {
         //Given
-        val time = ComposeTimePickerTime.TwelveHourTime(12, 55, TimeOfDay.AM)
+        val time = ComposeTimePickerTime(20, 55)
 
         //When
-        viewModel.updateUiState(time, MinuteGap.FIVE)
+        viewModel.updateUiState(time, MinuteGap.FIVE, true)
 
         //Then
-        (viewModel.getSelectedTime() as ComposeTimePickerTime.TwelveHourTime).let {
-            assertEquals(12, it.hour)
+        viewModel.uiState.value?.let {
+            val hour = it.hours[it.selectedHourIndex].toInt()
+            val minute = it.minutes[it.selectedMinuteIndex].toInt()
+            assertEquals(20, hour)
+            assertEquals(55, minute)
+        }
+    }
+
+    @Test
+    fun getUiStateTimeProvided_when_minuteProvidedIsNotMultipleOfMinuteGap_shouldUpdateTheUiStateAccordingly() {
+        //Given
+        val time = ComposeTimePickerTime(20, 51)
+
+        //When
+        viewModel.updateUiState(time, MinuteGap.FIVE, true)
+
+        //Then
+        viewModel.uiState.value?.let {
+            val hour = it.hours[it.selectedHourIndex].toInt()
+            val minute = it.minutes[it.selectedMinuteIndex].toInt()
+            assertEquals(20, hour)
+            assertEquals(55, minute)
+        }
+    }
+
+    @Test
+    fun updateSelectedHourIndex_when_13HoursAdded_shouldChangeTimeOfDay() {
+        //Given
+        val time = ComposeTimePickerTime(10, 55)
+
+        //When
+        viewModel.updateUiState(time, MinuteGap.FIVE, false)
+        viewModel.uiState.value?.let {
+            viewModel.updateSelectedHourIndex(it.selectedHourIndex + 13)
+        }
+
+        //Then
+        viewModel.uiState.value?.let {
+            assertEquals(1, it.selectedTimeOfDayIndex)
+        }
+    }
+
+    @Test
+    fun getSelectedTime_when_is24HourIsFalse_shouldReturnCorrectHoursAndMinutes(){
+        //Given
+        val time = ComposeTimePickerTime(20, 55)
+
+        //When
+        viewModel.updateUiState(time, MinuteGap.FIVE, false)
+
+        //Then
+        viewModel.getSelectedTime()?.let {
+            assertEquals(20, it.hour)
             assertEquals(55, it.minute)
-            assertEquals(TimeOfDay.AM, it.timeOfDay)
         }
     }
-
-    @Test
-    fun getUiStateTimeProvided_when_itIsAValid24HourClock_shouldUpdateTheUiStateAccordingly() {
-        //Given
-        val time = ComposeTimePickerTime.TwentyFourHourTime(12, 35)
-
-        //When
-        viewModel.updateUiState(time, MinuteGap.FIVE)
-
-        //Then
-        (viewModel.getSelectedTime() as ComposeTimePickerTime.TwentyFourHourTime).let {
-            assertEquals(12, it.hour)
-            assertEquals(35, it.minute)
-        }
-    }
-
-
 }

@@ -6,15 +6,24 @@ import androidx.lifecycle.ViewModel
 import com.vsnappy1.timepicker.data.Constant
 import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
 import com.vsnappy1.timepicker.enums.MinuteGap
-import com.vsnappy1.timepicker.enums.TimeOfDay
 import com.vsnappy1.timepicker.ui.model.TimePickerUiState
 
 internal class TimePickerViewModel : ViewModel() {
 
     private val _uiState: MutableLiveData<TimePickerUiState> = MutableLiveData(TimePickerUiState())
     val uiState: LiveData<TimePickerUiState> = _uiState
+    private var hour: Int =
+        0 // When time of the day is manually selected by user we either add or subtract this
+
     fun updateSelectedHourIndex(index: Int) {
         _uiState.value = _uiState.value?.copy(selectedHourIndex = index)
+        _uiState.value?.apply {
+            if (!is24Hour) {
+                _uiState.value = this.copy(
+                    selectedTimeOfDayIndex = if ((index + 1 + hour) % 24 >= 12) 1 else 0
+                )
+            }
+        }
     }
 
     fun updateSelectedMinuteIndex(index: Int) {
@@ -22,70 +31,50 @@ internal class TimePickerViewModel : ViewModel() {
     }
 
     fun updateSelectedTimeOfDayIndex(index: Int) {
-        _uiState.value = _uiState.value?.copy(selectedTimeOfDayIndex = index)
+        if (index != _uiState.value?.selectedTimeOfDayIndex) {
+            _uiState.value = _uiState.value?.copy(selectedTimeOfDayIndex = index)
+            hour += if (index == 1) 12 else -12
+        }
     }
 
     fun getSelectedTime(): ComposeTimePickerTime? {
         val time = _uiState.value?.let {
-            if (it.is24Hour) {
-                ComposeTimePickerTime.TwentyFourHourTime(
-                    it.hours[it.selectedHourIndex].toInt(),
-                    it.minutes[it.selectedMinuteIndex].toInt()
-                )
-            } else {
-                ComposeTimePickerTime.TwelveHourTime(
-                    it.hours[it.selectedHourIndex].toInt(),
-                    it.minutes[it.selectedMinuteIndex].toInt(),
-                    if (it.timesOfDay[it.selectedTimeOfDayIndex] == "AM") TimeOfDay.AM else TimeOfDay.PM
-                )
+            var hour = it.hours[it.selectedHourIndex].toInt()
+            if (!it.is24Hour) {
+                hour = hour % 12 + if (it.selectedTimeOfDayIndex == 1) 12 else 0
             }
+            ComposeTimePickerTime(
+                hour,
+                it.minutes[it.selectedMinuteIndex].toInt()
+            )
         }
         return time
     }
 
     fun updateUiState(
         timePickerTime: ComposeTimePickerTime,
-        minuteGap: MinuteGap
+        minuteGap: MinuteGap,
+        is24: Boolean
     ) {
-        _uiState.value = getUiStateTimeProvided(timePickerTime, minuteGap)
+        _uiState.value = getUiStateTimeProvided(timePickerTime, minuteGap, is24)
     }
 
     fun getUiStateTimeProvided(
         timePickerTime: ComposeTimePickerTime,
-        minuteGap: MinuteGap
+        minuteGap: MinuteGap,
+        is24: Boolean
     ): TimePickerUiState {
-        var hour = 0
-        var minute = 0
-        var timeOfDay = TimeOfDay.PM
-        if (timePickerTime is ComposeTimePickerTime.TwentyFourHourTime) {
-            if (timePickerTime.hour < 0 || timePickerTime.hour > 23) {
-                throw IllegalArgumentException("Invalid hour: ${timePickerTime.hour}, The hour value must be between 0 and 23 inclusive.")
-            }
-            if (timePickerTime.minute < 0 || timePickerTime.minute > 59) {
-                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, The minute value must be between 0 and 59 inclusive.")
-            }
-            if (timePickerTime.minute % minuteGap.gap != 0) {
-                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, Since minute gap is ${minuteGap.gap} the minute value must be multiple of ${minuteGap.gap} & between 0 and 59 inclusive. If you want some other value (e.g. 1,2,3....59) please change minuteGap attribute to MinuteGap.ONE.")
-            }
-            hour = timePickerTime.hour
-            minute = timePickerTime.minute
 
-        } else if (timePickerTime is ComposeTimePickerTime.TwelveHourTime) {
-            if (timePickerTime.hour < 1 || timePickerTime.hour > 12) {
-                throw IllegalArgumentException("Invalid hour: ${timePickerTime.hour}, The hour value must be between 1 and 12 inclusive.")
-            }
-            if (timePickerTime.minute < 0 || timePickerTime.minute > 59) {
-                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, The minute value must be between 0 and 59 inclusive.")
-            }
-            if (timePickerTime.minute % minuteGap.gap != 0) {
-                throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, Since minute gap is ${minuteGap.gap} the minute value must be multiple of ${minuteGap.gap} & between 0 and 59 inclusive. If you want some other value (e.g. 1,2,3....59) please change minuteGap attribute to MinuteGap.ONE.")
-            }
-            hour = timePickerTime.hour
-            minute = timePickerTime.minute
-            timeOfDay = timePickerTime.timeOfDay
+        if (timePickerTime.hour < 0 || timePickerTime.hour > 23) {
+            throw IllegalArgumentException("Invalid hour: ${timePickerTime.hour}, The hour value must be between 0 and 23 inclusive.")
+        }
+        if (timePickerTime.minute < 0 || timePickerTime.minute > 59) {
+            throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, The minute value must be between 0 and 59 inclusive.")
         }
 
-        val is24 = timePickerTime is ComposeTimePickerTime.TwentyFourHourTime
+        val hour: Int = timePickerTime.hour
+        val minute: Int = Constant.getNearestNextMinute(timePickerTime.minute, minuteGap)
+
         return TimePickerUiState(
             is24Hour = is24,
             minuteGap = minuteGap,
@@ -94,7 +83,7 @@ internal class TimePickerViewModel : ViewModel() {
             minutes = Constant.getMinutes(minuteGap),
             selectedMinuteIndex = Constant.getMiddleOfMinute(minuteGap) + minute / minuteGap.gap,
             timesOfDay = Constant.getTimesOfDay(),
-            selectedTimeOfDayIndex = timeOfDay.value
+            selectedTimeOfDayIndex = if (hour >= 11) 1 else 0
         )
     }
 }
