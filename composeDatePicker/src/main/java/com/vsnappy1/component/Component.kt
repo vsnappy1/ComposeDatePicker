@@ -1,11 +1,13 @@
 package com.vsnappy1.component
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -34,7 +36,6 @@ fun AnimatedFadeVisibility(
     }
 }
 
-//TODO improve scrolling logic so scrolling looks more natural while keeping items clickable.
 @SuppressLint("FrequentlyChangedStateReadInComposition")
 @Composable
 fun SwipeLazyColumn(
@@ -48,33 +49,47 @@ fun SwipeLazyColumn(
     listState: LazyListState,
     content: LazyListScope.() -> Unit
 ) {
-    var lastSelectedIndex by remember { mutableStateOf(0) }
-    var isInitialScrollingDone by remember { mutableStateOf(false) }
-
-    if (isScrollingToSelectedItemEnabled) {
-        LaunchedEffect(key1 = selectedIndex) {
-            isInitialScrollingDone = false
-            delay(200)
-            listState.animateScrollToItem(selectedIndex)
-            delay(10)
-            isInitialScrollingDone = true
-        }
-    }
+    var isScrollingProgrammatically by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = Unit) {
         listState.scrollToItem(selectedIndex)
         delay(10)
-        isInitialScrollingDone = true
+        isScrollingProgrammatically = true
     }
+
+    if (isScrollingToSelectedItemEnabled) {
+        LaunchedEffect(key1 = selectedIndex) {
+            isScrollingProgrammatically = false
+            delay(200)
+            listState.animateScrollToItem(selectedIndex)
+            delay(10)
+            isScrollingProgrammatically = true
+        }
+    }
+
+    // Update selected item index
     LaunchedEffect(key1 = listState.firstVisibleItemScrollOffset) {
-        if (!isAutoScrolling && isInitialScrollingDone) {
+        if (!isAutoScrolling && isScrollingProgrammatically) {
             val index =
                 listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > height.value / numberOfRowsDisplayed) 1 else 0
             onSelectedIndexChange(index)
-            if (index == lastSelectedIndex) {
-                listState.animateScrollToItem(selectedIndex)
+        }
+    }
+
+    // For smooth scrolling to center item
+    var isAnimateScrollToItemTriggered by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = listState.isScrollInProgress) {
+        Log.d("--TAG", "list: ${listState.isScrollInProgress}")
+        if (!isAnimateScrollToItemTriggered) {
+            listState.animateScrollToItem(selectedIndex)
+            isAnimateScrollToItemTriggered = true
+        }
+    }
+    LaunchedEffect(key1 = listState.interactionSource.interactions) {
+        listState.interactionSource.interactions.collect {
+            if (it is DragInteraction.Start) {
+                isAnimateScrollToItemTriggered = false
             }
-            lastSelectedIndex = index
         }
     }
 
