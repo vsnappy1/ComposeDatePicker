@@ -17,7 +17,7 @@ Step 2. Add the dependency
 ```kotlin
 dependencies {
     ..
-    implementation 'com.github.vsnappy1:ComposeDatePicker:1.5.0'
+    implementation 'com.github.vsnappy1:ComposeDatePicker:1.7.0'
 }
 ```
 
@@ -33,7 +33,7 @@ DatePicker(onDateSelected = { year, month, day ->
 ![Screenshot_datepicker_2](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/daa6f19f-be5b-46ab-8844-58b0e61c6545)
 
 ```kotlin
-TimePicker(onTimeSelected = { hour, minute, timeOfDay ->
+TimePicker(onTimeSelected = { hour, minute ->
 
 })
 ```
@@ -93,12 +93,11 @@ ___
 #### Set Custom Time
 ```kotlin
 TimePicker(
-    onTimeSelected = { hour, minute, timeOfDay ->
+    onTimeSelected = { hour, minute ->
     },
-    time = ComposeTimePickerTime.TwelveHourTime(
+    time = ComposeTimePickerTime(
         hour = 12,
-        minute = 45,
-        timeOfDay = TimeOfDay.AM
+        minute = 45
     )
 )
 ```
@@ -106,10 +105,10 @@ TimePicker(
 #### Set Is24Hour & MinuteGap
 ```kotlin
 TimePicker(
-    onTimeSelected = { hour, minute, timeOfDay ->
+    onTimeSelected = { hour, minute ->
     },
     is24Hour = true,
-    minuteGap = MinuteGap.ONE
+    minuteGap = MinuteGap.FIVE
 )
 ```
 The **_minuteGap_** parameter determines the interval between consecutive items in the list. 
@@ -122,7 +121,7 @@ TimePicker(
     modifier = Modifier
         .padding(16.dp)
         .background(Color(0xFF1B5E20), RoundedCornerShape(8.dp)),
-    onTimeSelected = { hour, minute, timeOfDay ->
+    onTimeSelected = { hour, minute ->
     },
     configuration = TimePickerConfiguration.Builder()
         .numberOfTimeRowsDisplayed(count = 5)
