@@ -75,7 +75,7 @@ internal object Constant {
 
     fun getNearestNextMinute(minute: Int, minuteGap: MinuteGap): Int {
         if (minuteGap.gap == 1) return minute
-        var value = minuteGap.gap
+        var value = 0
         while (value < minute) {
             value += minuteGap.gap
         }

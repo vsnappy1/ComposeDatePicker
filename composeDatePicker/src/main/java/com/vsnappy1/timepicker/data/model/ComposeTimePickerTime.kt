@@ -7,12 +7,10 @@ import java.util.Calendar
 class ComposeTimePickerTime(val hour: Int, val minute: Int) {
 
     companion object DefaultTime {
-        fun getTime(minuteGap: MinuteGap): ComposeTimePickerTime {
-            val minute =
-                Constant.getNearestNextMinute(Calendar.getInstance()[Calendar.MINUTE], minuteGap)
+        fun getTime(): ComposeTimePickerTime {
             return ComposeTimePickerTime(
                 Calendar.getInstance()[Calendar.HOUR_OF_DAY],
-                minute
+                Calendar.getInstance()[Calendar.MINUTE]
             )
         }
     }

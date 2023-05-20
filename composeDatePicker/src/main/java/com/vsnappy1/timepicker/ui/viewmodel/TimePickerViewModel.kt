@@ -78,8 +78,8 @@ internal class TimePickerViewModel : ViewModel() {
             throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, The minute value must be between 0 and 59 inclusive.")
         }
 
-        val hour: Int = timePickerTime.hour
         val minute: Int = Constant.getNearestNextMinute(timePickerTime.minute, minuteGap)
+        val hour: Int = timePickerTime.hour + if(minute == 0 && timePickerTime.minute != 0) 1 else 0
 
         return TimePickerUiState(
             is24Hour = is24,
@@ -89,7 +89,7 @@ internal class TimePickerViewModel : ViewModel() {
             minutes = Constant.getMinutes(minuteGap),
             selectedMinuteIndex = Constant.getMiddleOfMinute(minuteGap) + minute / minuteGap.gap,
             timesOfDay = Constant.getTimesOfDay(),
-            selectedTimeOfDayIndex = if (hour >= 11) 1 else 0
+            selectedTimeOfDayIndex = if (hour in 12..23) 1 else 0
         )
     }
 }
