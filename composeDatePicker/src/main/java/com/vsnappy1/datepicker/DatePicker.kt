@@ -1,6 +1,5 @@
 package com.vsnappy1.datepicker
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -26,7 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -63,7 +61,6 @@ import com.vsnappy1.extension.toDp
 import com.vsnappy1.theme.Size.medium
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
-import kotlin.random.Random
 
 
 @Composable
@@ -221,7 +218,7 @@ private fun SwipeLazyColumn(
 ) {
     val coroutineScope = rememberCoroutineScope()
     var isAutoScrolling by remember { mutableStateOf(false) }
-    val listState = rememberLazyListState()
+    val listState = rememberLazyListState(selectedIndex)
     com.vsnappy1.component.SwipeLazyColumn(
         modifier = modifier,
         selectedIndex = selectedIndex,
@@ -229,7 +226,8 @@ private fun SwipeLazyColumn(
         isAutoScrolling = isAutoScrolling,
         height = height,
         numberOfRowsDisplayed = configuration.numberOfMonthYearRowsDisplayed,
-        listState = listState
+        listState = listState,
+        onScrollingStopped = {}
     ) {
         // I add some empty rows at the beginning and end of list to make it feel that it is a center focused list
         val count = items.size + configuration.numberOfMonthYearRowsDisplayed - 1

@@ -63,34 +63,25 @@ fun TimePicker(
         selectedHourIndex = uiState.selectedHourIndex,
         onSelectedHourIndexChange = {
             viewModel.updateSelectedHourIndex(it)
-            viewModel.getSelectedTime()?.apply {
-                onTimeSelected(hour, minute)
-            }
         },
         minutes = uiState.minutes,
         selectedMinuteIndex = uiState.selectedMinuteIndex,
         onSelectedMinuteIndexChange = {
             viewModel.updateSelectedMinuteIndex(it)
-            viewModel.getSelectedTime()?.apply {
-                onTimeSelected(hour, minute)
-            }
         },
         timesOfDay = uiState.timesOfDay,
         selectedTimeOfDayIndex = uiState.selectedTimeOfDayIndex,
         onSelectedTimeOfDayIndexChange = {
             viewModel.updateSelectedTimeOfDayIndex(it)
+        },
+        is24Hour = uiState.is24Hour,
+        configuration = configuration,
+        onScrollingStopped = {
             viewModel.getSelectedTime()?.apply {
                 onTimeSelected(hour, minute)
             }
-        },
-        is24Hour = uiState.is24Hour,
-        configuration = configuration
+        }
     )
-    LaunchedEffect(key1 = Unit) { viewModel.getSelectedTime()?.trigger(onTimeSelected) }
-}
-
-private fun ComposeTimePickerTime.trigger(onTimeSelected: (Int, Int) -> Unit) {
-    onTimeSelected(hour, minute)
 }
 
 @Composable
@@ -107,6 +98,7 @@ private fun TimePickerView(
     onSelectedTimeOfDayIndexChange: (Int) -> Unit,
     is24Hour: Boolean,
     configuration: TimePickerConfiguration,
+    onScrollingStopped: () -> Unit,
 ) {
     var height by remember { mutableStateOf(configuration.height) }
     Box(
@@ -139,7 +131,8 @@ private fun TimePickerView(
                 items = hours,
                 alignment = Alignment.CenterEnd,
                 configuration = configuration,
-                height = height
+                height = height,
+                onScrollingStopped = onScrollingStopped
             )
             SwipeLazyColumn(
                 modifier = Modifier.weight(if (is24Hour) 0.5f else 0.2f),
@@ -149,7 +142,8 @@ private fun TimePickerView(
                 textAlign = if (is24Hour) TextAlign.Start else TextAlign.Center,
                 alignment = if (is24Hour) Alignment.CenterStart else Alignment.Center,
                 configuration = configuration,
-                height = height
+                height = height,
+                onScrollingStopped = onScrollingStopped
             )
             if (!is24Hour) {
                 SwipeLazyColumn(
@@ -160,7 +154,8 @@ private fun TimePickerView(
                     alignment = Alignment.CenterStart,
                     configuration = configuration,
                     height = height,
-                    isScrollingToSelectedItemEnabled = true
+                    isScrollingToSelectedItemEnabled = true,
+                    onScrollingStopped = onScrollingStopped
                 )
             }
         }
@@ -177,11 +172,12 @@ private fun SwipeLazyColumn(
     alignment: Alignment = Alignment.CenterStart,
     configuration: TimePickerConfiguration,
     isScrollingToSelectedItemEnabled: Boolean = false,
-    height: Dp
+    height: Dp,
+    onScrollingStopped: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     var isAutoScrolling by remember { mutableStateOf(false) }
-    val listState = rememberLazyListState()
+    val listState = rememberLazyListState(selectedIndex)
     com.vsnappy1.component.SwipeLazyColumn(
         modifier = modifier,
         selectedIndex = selectedIndex,
@@ -190,7 +186,11 @@ private fun SwipeLazyColumn(
         height = height,
         isScrollingToSelectedItemEnabled = isScrollingToSelectedItemEnabled,
         numberOfRowsDisplayed = configuration.numberOfTimeRowsDisplayed,
-        listState = listState
+        listState = listState,
+        onScrollingStopped = {
+            isAutoScrolling = false
+            onScrollingStopped()
+        }
     ) {
         // we add some empty rows at the beginning and end of list to make it feel that it is a center focused list
         val count = items.size + configuration.numberOfTimeRowsDisplayed - 1
@@ -209,6 +209,7 @@ private fun SwipeLazyColumn(
                         onSelectedIndexChange(index)
                         listState.animateScrollToItem(index)
                         isAutoScrolling = false
+                        onScrollingStopped()
                     }
                 }
             )

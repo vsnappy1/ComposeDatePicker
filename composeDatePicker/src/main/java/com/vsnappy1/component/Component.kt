@@ -1,7 +1,6 @@
 package com.vsnappy1.component
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.tween
@@ -47,29 +46,34 @@ fun SwipeLazyColumn(
     isScrollingToSelectedItemEnabled: Boolean = false,
     numberOfRowsDisplayed: Int,
     listState: LazyListState,
+    onScrollingStopped: () -> Unit,
     content: LazyListScope.() -> Unit
 ) {
-    var isScrollingProgrammatically by remember { mutableStateOf(false) }
+    var isManualScrolling by remember { mutableStateOf(true) }
+    var isInitialWaitOver by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = Unit) {
-        listState.scrollToItem(selectedIndex)
-        delay(10)
-        isScrollingProgrammatically = true
+        delay(250)
+        isInitialWaitOver =
+            true // because not two animateScrollToItem should be called at once and this delay protect that from happening.
     }
 
     if (isScrollingToSelectedItemEnabled) {
         LaunchedEffect(key1 = selectedIndex) {
-            isScrollingProgrammatically = false
-            delay(200)
-            listState.animateScrollToItem(selectedIndex)
-            delay(10)
-            isScrollingProgrammatically = true
+            if (isInitialWaitOver) {
+                isManualScrolling = false
+                if (!listState.isScrollInProgress) {
+                    listState.animateScrollToItem(selectedIndex)
+                }
+                delay(10)
+                isManualScrolling = true
+            }
         }
     }
 
     // Update selected item index
     LaunchedEffect(key1 = listState.firstVisibleItemScrollOffset) {
-        if (!isAutoScrolling && isScrollingProgrammatically) {
+        if (!isAutoScrolling && isManualScrolling) {
             val index =
                 listState.firstVisibleItemIndex + if (listState.firstVisibleItemScrollOffset > height.value / numberOfRowsDisplayed) 1 else 0
             onSelectedIndexChange(index)
@@ -79,10 +83,10 @@ fun SwipeLazyColumn(
     // For smooth scrolling to center item
     var isAnimateScrollToItemTriggered by remember { mutableStateOf(false) }
     LaunchedEffect(key1 = listState.isScrollInProgress) {
-        Log.d("--TAG", "list: ${listState.isScrollInProgress}")
         if (!isAnimateScrollToItemTriggered) {
             listState.animateScrollToItem(selectedIndex)
             isAnimateScrollToItemTriggered = true
+            onScrollingStopped()
         }
     }
     LaunchedEffect(key1 = listState.interactionSource.interactions) {

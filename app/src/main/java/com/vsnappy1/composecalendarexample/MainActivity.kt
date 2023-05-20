@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.vsnappy1.composecalendarexample.ui.theme.ComposeCalendarExampleTheme
 import com.vsnappy1.datepicker.DatePicker
 import com.vsnappy1.timepicker.TimePicker
+import com.vsnappy1.timepicker.enums.MinuteGap
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +43,8 @@ class MainActivity : ComponentActivity() {
                         TimePicker(
                             onTimeSelected = { hour, minute ->
                                 text = "$hour : $minute "
-                            }
+                            },
+                            minuteGap = MinuteGap.FIVE
                         )
                         Text(text)
                     }

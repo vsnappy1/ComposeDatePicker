@@ -3,10 +3,13 @@ package com.vsnappy1.timepicker.ui.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.vsnappy1.timepicker.data.Constant
 import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
 import com.vsnappy1.timepicker.enums.MinuteGap
 import com.vsnappy1.timepicker.ui.model.TimePickerUiState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 internal class TimePickerViewModel : ViewModel() {
 
@@ -19,9 +22,12 @@ internal class TimePickerViewModel : ViewModel() {
         _uiState.value = _uiState.value?.copy(selectedHourIndex = index)
         _uiState.value?.apply {
             if (!is24Hour) {
-                _uiState.value = this.copy(
-                    selectedTimeOfDayIndex = if ((index + 1 + hour) % 24 >= 12) 1 else 0
-                )
+                viewModelScope.launch {
+                    delay(200)
+                    _uiState.value = _uiState.value?.copy(
+                        selectedTimeOfDayIndex = if ((index + 1 + hour) % 24 >= 12) 1 else 0
+                    )
+                }
             }
         }
     }
