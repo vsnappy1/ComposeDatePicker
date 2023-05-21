@@ -2,6 +2,7 @@
 An Android Jetpack Compose library that provides a Date & Time Picker functionality.
 
 [![](https://jitpack.io/v/vsnappy1/ComposeDatePicker.svg)](https://jitpack.io/#vsnappy1/ComposeDatePicker)
+[![API](https://img.shields.io/badge/API-24%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=24)
 
 ## Setup
 Step 1. Add the JitPack repository to your build file (Add it in your root build.gradle at the end of repositories)
