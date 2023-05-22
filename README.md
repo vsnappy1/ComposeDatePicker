@@ -31,8 +31,7 @@ DatePicker(onDateSelected = { year, month, day ->
 })
 ```
 ![DatePicker Gif](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/b56c58e4-ce7a-4c62-bb06-7e2e96a59b33)
-![Screenshot_datepicker_1 (1)](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/740ec79f-d7d5-407b-9010-beab4774169e) -
-![Screenshot_datepicker_2](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/daa6f19f-be5b-46ab-8844-58b0e61c6545)
+![Screenshot_datepicker_1 (1)](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/740ec79f-d7d5-407b-9010-beab4774169e)
 
 
 
