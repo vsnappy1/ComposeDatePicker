@@ -30,14 +30,18 @@ DatePicker(onDateSelected = { year, month, day ->
     
 })
 ```
+![DatePicker Gif](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/b56c58e4-ce7a-4c62-bb06-7e2e96a59b33)
 ![Screenshot_datepicker_1 (1)](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/740ec79f-d7d5-407b-9010-beab4774169e) -
 ![Screenshot_datepicker_2](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/daa6f19f-be5b-46ab-8844-58b0e61c6545)
+
+
 
 ```kotlin
 TimePicker(onTimeSelected = { hour, minute ->
 
 })
 ```
+![TimePicker Gif](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/15f21b3f-93ac-4f79-8174-46ed128cb7ff)
 ![Screenshot_timepicker](https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/de0373a3-f7f6-42bd-9f4f-0a221ca68d98)
 
 
