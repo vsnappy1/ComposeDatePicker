@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 internal class DatePickerViewModel : ViewModel() {
 
-    private var _uiState = MutableLiveData(DatePickerUiState())
+    private var _uiState: MutableLiveData<DatePickerUiState> = MutableLiveData(DatePickerUiState())
     val uiState: LiveData<DatePickerUiState> = _uiState
     private lateinit var availableMonths: List<Month>
 
