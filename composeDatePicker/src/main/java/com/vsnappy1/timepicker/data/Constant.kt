@@ -4,7 +4,7 @@ import com.vsnappy1.timepicker.enums.MinuteGap
 
 internal object Constant {
 
-    private const val repeatCount: Int = 60
+    private const val repeatCount: Int = 200
 
     private fun findHours(is24Hour: Boolean): List<String> {
         if (is24Hour) return listOf(

@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 internal class TimePickerViewModel : ViewModel() {
 
-    private val _uiState: MutableLiveData<TimePickerUiState> = MutableLiveData()
+    private val _uiState: MutableLiveData<TimePickerUiState> = MutableLiveData(TimePickerUiState())
     val uiState: LiveData<TimePickerUiState> = _uiState
     private var hour: Int =
         0 // When time of the day is manually selected by user we either add or subtract this
