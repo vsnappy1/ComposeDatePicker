@@ -73,10 +73,6 @@ fun DatePicker(
     id: Int = 1
 ) {
     val viewModel: DatePickerViewModel = viewModel(key = "DatePickerViewModel$id")
-
-    // Key is Unit because I want this to run only once not every time when is composable is recomposed.
-    LaunchedEffect(key1 = Unit) { viewModel.setDate(date) }
-
     val uiState by viewModel.uiState.observeAsState(
         DatePickerUiState(
             selectedYear = date.year,
@@ -84,6 +80,8 @@ fun DatePicker(
             selectedDayOfMonth = date.day
         )
     )
+    // Key is Unit because I want this to run only once not every time when is composable is recomposed.
+    LaunchedEffect(key1 = Unit) { viewModel.setDate(date) }
 
     var height by remember { mutableStateOf(configuration.height) }
     Box(modifier = modifier.onGloballyPositioned {

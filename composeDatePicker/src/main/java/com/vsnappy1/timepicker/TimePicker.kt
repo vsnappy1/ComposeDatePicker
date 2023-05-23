@@ -54,8 +54,8 @@ fun TimePicker(
     val timePickerTime = time ?: ComposeTimePickerTime.getTime()
     val is24: Boolean = is24Hour ?: DateFormat.is24HourFormat(LocalContext.current)
     val timePickerUiState = viewModel.getUiStateTimeProvided(timePickerTime, minuteGap, is24)
-    LaunchedEffect(key1 = Unit) { viewModel.updateUiState(timePickerTime, minuteGap, is24) }
     val uiState by viewModel.uiState.observeAsState(timePickerUiState)
+    LaunchedEffect(key1 = Unit) { viewModel.updateUiState(timePickerTime, minuteGap, is24) }
 
     TimePickerView(
         modifier = modifier,
