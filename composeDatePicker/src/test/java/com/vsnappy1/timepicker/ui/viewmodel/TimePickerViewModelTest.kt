@@ -1,8 +1,12 @@
 package com.vsnappy1.timepicker.ui.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
+import com.vsnappy1.MainCoroutineRule
+import com.vsnappy1.timepicker.data.model.TimePickerTime
 import com.vsnappy1.timepicker.enums.MinuteGap
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -16,6 +20,9 @@ class TimePickerViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    @get:Rule
+    val mainCoroutineRule = MainCoroutineRule()
+
     private lateinit var viewModel: TimePickerViewModel
 
     @Before
@@ -26,7 +33,7 @@ class TimePickerViewModelTest {
     @Test(expected = IllegalArgumentException::class)
     fun getUiStateTimeProvided_when_hourIsLessThanZero_shouldThrowException() {
         //Given
-        val time = ComposeTimePickerTime(-1, 45)
+        val time = TimePickerTime(-1, 45)
 
         //When
         viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE, true)
@@ -35,7 +42,7 @@ class TimePickerViewModelTest {
     @Test(expected = IllegalArgumentException::class)
     fun getUiStateTimeProvided_when_hourIsMoreThan23_shouldThrowException() {
         //Given
-        val time = ComposeTimePickerTime(24, 45)
+        val time = TimePickerTime(24, 45)
 
         //When
         viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE, true)
@@ -44,7 +51,7 @@ class TimePickerViewModelTest {
     @Test(expected = IllegalArgumentException::class)
     fun getUiStateTimeProvided_when_minuteIsLessThanZero_shouldThrowException() {
         //Given
-        val time = ComposeTimePickerTime(12, -1)
+        val time = TimePickerTime(12, -1)
 
         //When
         viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE, true)
@@ -53,7 +60,7 @@ class TimePickerViewModelTest {
     @Test(expected = IllegalArgumentException::class)
     fun getUiStateTimeProvided_when_minuteIsMoreThan59_shouldThrowException() {
         //Given
-        val time = ComposeTimePickerTime(12, 60)
+        val time = TimePickerTime(12, 60)
 
         //When
         viewModel.getUiStateTimeProvided(time, MinuteGap.FIVE, true)
@@ -63,7 +70,7 @@ class TimePickerViewModelTest {
     @Test
     fun getUiStateTimeProvided_when_is24HourIsFalse_shouldUpdateTheUiStateAccordingly() {
         //Given
-        val time = ComposeTimePickerTime(20, 55)
+        val time = TimePickerTime(20, 55)
 
         //When
         viewModel.updateUiState(time, MinuteGap.FIVE, false)
@@ -81,7 +88,7 @@ class TimePickerViewModelTest {
     @Test
     fun getUiStateTimeProvided_when_is24HourIsTrue_shouldUpdateTheUiStateAccordingly() {
         //Given
-        val time = ComposeTimePickerTime(20, 55)
+        val time = TimePickerTime(20, 55)
 
         //When
         viewModel.updateUiState(time, MinuteGap.FIVE, true)
@@ -98,7 +105,7 @@ class TimePickerViewModelTest {
     @Test
     fun getUiStateTimeProvided_when_minuteProvidedIsNotMultipleOfMinuteGap_shouldUpdateTheUiStateAccordingly() {
         //Given
-        val time = ComposeTimePickerTime(20, 51)
+        val time = TimePickerTime(20, 51)
 
         //When
         viewModel.updateUiState(time, MinuteGap.FIVE, true)
@@ -112,16 +119,18 @@ class TimePickerViewModelTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun updateSelectedHourIndex_when_13HoursAdded_shouldChangeTimeOfDay() {
+    fun updateSelectedHourIndex_when_13HoursAdded_shouldChangeTimeOfDay() = runTest{
         //Given
-        val time = ComposeTimePickerTime(10, 55)
+        val time = TimePickerTime(0, 55)
 
         //When
         viewModel.updateUiState(time, MinuteGap.FIVE, false)
         viewModel.uiState.value?.let {
             viewModel.updateSelectedHourIndex(it.selectedHourIndex + 13)
         }
+        advanceTimeBy(250)
 
         //Then
         viewModel.uiState.value?.let {
@@ -132,7 +141,7 @@ class TimePickerViewModelTest {
     @Test
     fun getSelectedTime_when_is24HourIsFalse_shouldReturnCorrectHoursAndMinutes() {
         //Given
-        val time = ComposeTimePickerTime(20, 55)
+        val time = TimePickerTime(20, 55)
 
         //When
         viewModel.updateUiState(time, MinuteGap.FIVE, false)
@@ -147,7 +156,7 @@ class TimePickerViewModelTest {
     @Test
     fun getSelectedTime_when_minuteGapIsFive_shouldCeilTheMinuteToNearestMultipleOfMinuteGap() {
         //Given
-        val time = ComposeTimePickerTime(20, 53)
+        val time = TimePickerTime(20, 53)
 
         //When
         viewModel.updateUiState(time, MinuteGap.FIVE, false)
@@ -162,7 +171,7 @@ class TimePickerViewModelTest {
     @Test
     fun getSelectedTime_when_minuteGapIsFiveAndCurrentMinuteIsMoreThan55_shouldMakeTheMinuteZeroAndIncrementTheHour() {
         //Given
-        val time = ComposeTimePickerTime(20, 57)
+        val time = TimePickerTime(20, 57)
 
         //When
         viewModel.updateUiState(time, MinuteGap.FIVE, false)
@@ -177,7 +186,7 @@ class TimePickerViewModelTest {
     @Test
     fun getSelectedTime_when_minuteGapIsFiveItIsElevenOClockAMAndCurrentMinuteIsMoreThan55_shouldMakeTheMinuteZeroAndIncrementTheHourAndChangeTimeOfTheDay() {
         //Given
-        val time = ComposeTimePickerTime(11, 57)
+        val time = TimePickerTime(11, 57)
 
         //When
         viewModel.updateUiState(time, MinuteGap.FIVE, false)
@@ -194,7 +203,7 @@ class TimePickerViewModelTest {
     @Test
     fun getSelectedTime_when_minuteGapIsFiveItIsElevenOClockPMAndCurrentMinuteIsMoreThan55_shouldMakeTheMinuteZeroAndIncrementTheHourAndChangeTimeOfTheDay() {
         //Given
-        val time = ComposeTimePickerTime(23, 57)
+        val time = TimePickerTime(23, 57)
 
         //When
         viewModel.updateUiState(time, MinuteGap.FIVE, false)

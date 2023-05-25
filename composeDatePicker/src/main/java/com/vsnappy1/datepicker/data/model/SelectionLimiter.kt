@@ -4,10 +4,10 @@ import com.vsnappy1.extension.isEqual
 import java.util.Calendar
 
 class SelectionLimiter(
-    private val fromDate: ComposeDatePickerDate? = null,
-    private val toDate: ComposeDatePickerDate? = null
+    private val fromDate: DatePickerDate? = null,
+    private val toDate: DatePickerDate? = null
 ) {
-    fun isWithinRange(date: ComposeDatePickerDate): Boolean {
+    fun isWithinRange(date: DatePickerDate): Boolean {
 
 
         val fromDate =

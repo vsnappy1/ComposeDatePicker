@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vsnappy1.datepicker.data.Constant
-import com.vsnappy1.datepicker.data.model.ComposeDatePickerDate
+import com.vsnappy1.datepicker.data.model.DatePickerDate
 import com.vsnappy1.datepicker.data.model.Month
 import com.vsnappy1.datepicker.ui.model.DatePickerUiState
 import kotlinx.coroutines.delay
@@ -130,7 +130,7 @@ internal class DatePickerViewModel : ViewModel() {
     }
 
     fun setDate(
-        date: ComposeDatePickerDate,
+        date: DatePickerDate,
         calendar: Calendar = Calendar.getInstance()
     ) {
         val yearMin = Constant.years.first()

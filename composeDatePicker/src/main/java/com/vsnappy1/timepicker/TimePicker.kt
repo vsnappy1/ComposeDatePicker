@@ -34,7 +34,7 @@ import com.vsnappy1.extension.noRippleClickable
 import com.vsnappy1.extension.toDp
 import com.vsnappy1.theme.Size.extraLarge
 import com.vsnappy1.theme.Size.medium
-import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
+import com.vsnappy1.timepicker.data.model.TimePickerTime
 import com.vsnappy1.timepicker.enums.MinuteGap
 import com.vsnappy1.timepicker.ui.model.TimePickerConfiguration
 import com.vsnappy1.timepicker.ui.viewmodel.TimePickerViewModel
@@ -46,12 +46,12 @@ fun TimePicker(
     onTimeSelected: (Int, Int) -> Unit,
     is24Hour: Boolean? = null,
     minuteGap: MinuteGap = MinuteGap.ONE,
-    time: ComposeTimePickerTime? = null,
+    time: TimePickerTime? = null,
     configuration: TimePickerConfiguration = TimePickerConfiguration.Builder().build(),
     id: Int = 1
 ) {
     val viewModel: TimePickerViewModel = viewModel(key = "TimePickerViewModel$id")
-    val timePickerTime = time ?: ComposeTimePickerTime.getTime()
+    val timePickerTime = time ?: TimePickerTime.getTime()
     val is24: Boolean = is24Hour ?: DateFormat.is24HourFormat(LocalContext.current)
     val timePickerUiState = viewModel.getUiStateTimeProvided(timePickerTime, minuteGap, is24)
     val uiState by viewModel.uiState.observeAsState(timePickerUiState)

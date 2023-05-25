@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vsnappy1.timepicker.data.Constant
-import com.vsnappy1.timepicker.data.model.ComposeTimePickerTime
+import com.vsnappy1.timepicker.data.model.TimePickerTime
 import com.vsnappy1.timepicker.enums.MinuteGap
 import com.vsnappy1.timepicker.ui.model.TimePickerUiState
 import kotlinx.coroutines.delay
@@ -43,13 +43,13 @@ internal class TimePickerViewModel : ViewModel() {
         }
     }
 
-    fun getSelectedTime(): ComposeTimePickerTime? {
+    fun getSelectedTime(): TimePickerTime? {
         val time = _uiState.value?.let {
             var hour = it.hours[it.selectedHourIndex].toInt()
             if (!it.is24Hour) {
                 hour = hour % 12 + if (it.selectedTimeOfDayIndex == 1) 12 else 0
             }
-            ComposeTimePickerTime(
+            TimePickerTime(
                 hour,
                 it.minutes[it.selectedMinuteIndex].toInt()
             )
@@ -58,7 +58,7 @@ internal class TimePickerViewModel : ViewModel() {
     }
 
     fun updateUiState(
-        timePickerTime: ComposeTimePickerTime,
+        timePickerTime: TimePickerTime,
         minuteGap: MinuteGap,
         is24: Boolean
     ) {
@@ -66,7 +66,7 @@ internal class TimePickerViewModel : ViewModel() {
     }
 
     fun getUiStateTimeProvided(
-        timePickerTime: ComposeTimePickerTime,
+        timePickerTime: TimePickerTime,
         minuteGap: MinuteGap,
         is24: Boolean
     ): TimePickerUiState {

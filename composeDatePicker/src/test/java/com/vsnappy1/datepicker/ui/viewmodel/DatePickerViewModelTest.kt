@@ -4,7 +4,7 @@ import android.icu.util.Calendar
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.vsnappy1.MainCoroutineRule
 import com.vsnappy1.datepicker.data.Constant
-import com.vsnappy1.datepicker.data.model.ComposeDatePickerDate
+import com.vsnappy1.datepicker.data.model.DatePickerDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -179,7 +179,7 @@ class DatePickerViewModelTest {
     fun setDate_when_givenYearIsNotWithinRange_shouldThrowAndIllegalArgumentException() {
         //Given
         val lastYear = Constant.years.last()
-        val composeDatePickerDate = ComposeDatePickerDate(lastYear + 1, 0, 1)
+        val composeDatePickerDate = DatePickerDate(lastYear + 1, 0, 1)
 
         //When
         viewModel.setDate(composeDatePickerDate, calendar = calendar)
@@ -189,7 +189,7 @@ class DatePickerViewModelTest {
     fun setDate_when_givenMonthIsNotWithinRange_shouldThrowAndIllegalArgumentException() {
         //Given
         val lastYear = Constant.years.last()
-        val composeDatePickerDate = ComposeDatePickerDate(lastYear, 12, 1)
+        val composeDatePickerDate = DatePickerDate(lastYear, 12, 1)
 
         //When
         viewModel.setDate(composeDatePickerDate, calendar = calendar)
@@ -199,7 +199,7 @@ class DatePickerViewModelTest {
     fun setDate_when_givenDayIsZero_shouldThrowAndIllegalArgumentException() {
         //Given
         val lastYear = Constant.years.last()
-        val composeDatePickerDate = ComposeDatePickerDate(lastYear, 5, 0)
+        val composeDatePickerDate = DatePickerDate(lastYear, 5, 0)
 
         //When
         viewModel.setDate(composeDatePickerDate, calendar = calendar)
@@ -209,7 +209,7 @@ class DatePickerViewModelTest {
     fun setDate_when_givenDayIsMoreThenMaxDayOfMonth_shouldThrowAndIllegalArgumentException() {
         //Given
         val lastYear = Constant.years.last()
-        val composeDatePickerDate = ComposeDatePickerDate(lastYear, 5, 31)
+        val composeDatePickerDate = DatePickerDate(lastYear, 5, 31)
 
         //When
         viewModel.setDate(composeDatePickerDate, calendar = calendar)
@@ -225,7 +225,7 @@ class DatePickerViewModelTest {
         val day = 7
         val month = 5
         val year = Constant.years.last()
-        val composeDatePickerDate = ComposeDatePickerDate(year, month, day)
+        val composeDatePickerDate = DatePickerDate(year, month, day)
 
         Mockito.`when`(calendar.getActualMaximum(Calendar.DAY_OF_MONTH)).thenReturn(30)
 

@@ -48,7 +48,7 @@ import com.vsnappy1.component.AnimatedFadeVisibility
 import com.vsnappy1.composedatepicker.R
 import com.vsnappy1.datepicker.ui.model.DatePickerConfiguration
 import com.vsnappy1.datepicker.data.Constant
-import com.vsnappy1.datepicker.data.model.ComposeDatePickerDate
+import com.vsnappy1.datepicker.data.model.DatePickerDate
 import com.vsnappy1.datepicker.data.model.DefaultDate
 import com.vsnappy1.datepicker.data.model.Month
 import com.vsnappy1.datepicker.data.model.SelectionLimiter
@@ -67,7 +67,7 @@ import kotlin.math.ceil
 fun DatePicker(
     modifier: Modifier = Modifier,
     onDateSelected: (Int, Int, Int) -> Unit,
-    date: ComposeDatePickerDate = DefaultDate.defaultDate,
+    date: DatePickerDate = DefaultDate.defaultDate,
     selectionLimiter: SelectionLimiter = SelectionLimiter(),
     configuration: DatePickerConfiguration = DatePickerConfiguration.Builder().build(),
     id: Int = 1
@@ -363,7 +363,7 @@ private fun DateViewBodyItem(
         val day = value - currentVisibleMonth.firstDayOfMonth.number + 2
         val isSelected = day == selectedDayOfMonth && selectedMonth == currentVisibleMonth
         val isWithinRange = selectionLimiter.isWithinRange(
-            ComposeDatePickerDate(
+            DatePickerDate(
                 selectedYear,
                 currentVisibleMonth.number,
                 day
