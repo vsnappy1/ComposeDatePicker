@@ -1,11 +1,11 @@
 # ComposeDatePicker
-An Android Jetpack Compose library that provides a Date & Time Picker functionality.
+An Android Jetpack Compose library that provides a Composable Date Picker / Time Picker functionality.
 
 [![](https://jitpack.io/v/vsnappy1/ComposeDatePicker.svg)](https://jitpack.io/#vsnappy1/ComposeDatePicker)
 [![API](https://img.shields.io/badge/API-24%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=24)
 
 ## Setup
-Step 1. Add the JitPack repository to your build file (Add it in your root build.gradle at the end of repositories)
+__Step 1.__ Add the JitPack repository to your build file (Add it in your root *__build.gradle__* at the end of repositories)
 ```kotlin
 allprojects {
     repositories {
@@ -14,11 +14,13 @@ allprojects {
     }
 }
 ```
-Step 2. Add the dependency
+__Note*__ In newer projects you can add it in *__settings.gradle__*
+
+__Step 2.__ Add the dependency
 ```kotlin
 dependencies {
     ..
-    implementation 'com.github.vsnappy1:ComposeDatePicker:2.0.0'
+    implementation 'com.github.vsnappy1:ComposeDatePicker:2.2.0'
 }
 ```
 
@@ -55,7 +57,7 @@ ___
 DatePicker(
     onDateSelected = { year, month, day ->
     },
-    date = ComposeDatePickerDate(year = 2023, month = 0, day = 5)
+    date = DatePickerDate(year = 2023, month = 0, day = 5)
 )
 ```
 Please note that the **_year_** should be within a range of <current_year> ± 100 (inclusive). Additionally, for the **_month_**, 
@@ -67,8 +69,8 @@ DatePicker(
     onDateSelected = { year, month, day ->
     },
     selectionLimiter = SelectionLimiter(
-        fromDate = ComposeDatePickerDate(year = 2023, month = 4, day = 7),
-        toDate = ComposeDatePickerDate(year = 2023, month = 4, day = 21)
+        fromDate = DatePickerDate(year = 2023, month = 4, day = 7),
+        toDate = DatePickerDate(year = 2023, month = 4, day = 21)
     )
 )
 ```
@@ -99,7 +101,7 @@ ___
 TimePicker(
     onTimeSelected = { hour, minute ->
     },
-    time = ComposeTimePickerTime(
+    time = TimePickerTime(
         hour = 12,
         minute = 45
     )
@@ -115,8 +117,7 @@ TimePicker(
     minuteGap = MinuteGap.FIVE
 )
 ```
-The **_minuteGap_** parameter determines the interval between consecutive items in the list. 
-For example, if set to MinuteGap.FIVE, the minutes in the time picker will be displayed in the order 00, 05, 10,..., 60.
+The interval between consecutive items in the minute list is determined by the **_minuteGap_** parameter. When minuteGap is set to MinuteGap.FIVE, the minutes in the time picker will be displayed in increments of 5, such as 00, 05, 10,..., 55. The default value for minuteGap is MinuteGap.ONE, which means the minutes will be displayed in sequential order from 00 to 59.
 
 
 #### Customize the Appearance
