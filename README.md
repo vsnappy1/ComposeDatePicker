@@ -4,6 +4,10 @@ An Android Jetpack Compose library that provides a Composable Date Picker / Time
 [![](https://jitpack.io/v/vsnappy1/ComposeDatePicker.svg)](https://jitpack.io/#vsnappy1/ComposeDatePicker)
 [![API](https://img.shields.io/badge/API-24%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=24)
 
+<div align="center">
+  <video src="https://github.com/vsnappy1/ComposeDatePicker/assets/42217840/81267166-a136-4e7c-bc5d-1eaa965dd234" width="400" />
+</div>
+
 ## Setup
 __Step 1.__ Add the JitPack repository to your build file (Add it in your root *__build.gradle__* at the end of repositories)
 ```kotlin
