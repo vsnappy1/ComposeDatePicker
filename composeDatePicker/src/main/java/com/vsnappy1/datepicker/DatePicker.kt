@@ -71,10 +71,10 @@ fun DatePicker(
     selectionLimiter: SelectionLimiter = SelectionLimiter(),
     configuration: DatePickerConfiguration = DatePickerConfiguration.Builder().build(),
     id: Int = 1,
-    days: List<String>?=null,
-    months: List<String>?=null,
+    days: List<String>? = null, //is intended to hold a list of day names in any language, which can replace the default day names.
+    months: List<String>? = null //is intended to hold a list of month names that will appear instead of the default month names.
 
-    ) {
+) {
     val viewModel: DatePickerViewModel = viewModel(key = "DatePickerViewModel$id")
     val uiState by viewModel.uiState.observeAsState(
         DatePickerUiState(
@@ -87,13 +87,29 @@ fun DatePicker(
     LaunchedEffect(key1 = Unit) { viewModel.setDate(date) }
 
     var height by remember { mutableStateOf(configuration.height) }
+
+
+// This handles the month name by checking if a custom months list is provided and valid (exactly 12 items);
+// if so, use the corresponding month name from that list, else fallback to the default month name from uiState
     var monthName by remember(uiState.currentVisibleMonth.number) {
-        if(months?.size==12){
+        if (months != null && months.size == 12) {
             mutableStateOf(months[uiState.currentVisibleMonth.number])
-        }else{
+        } else {
             mutableStateOf(uiState.currentVisibleMonth.name)
         }
     }
+
+// This manages the months list by validating if the custom months list is at least 12 items long;
+// if valid, store it, otherwise fall back to the default months list from uiState
+    var monthsHolder by remember {
+        if (months != null && months.size == 12) {
+            mutableStateOf(months)
+        } else {
+            mutableStateOf(uiState.months)
+        }
+    }
+
+
 
 
     Box(modifier = modifier.onGloballyPositioned {
@@ -117,7 +133,8 @@ fun DatePicker(
         ) {
             AnimatedFadeVisibility(
                 visible = !uiState.isMonthYearViewVisible
-            ) {
+            )
+            {
                 DateView(
                     selectedYear = uiState.selectedYear,
                     currentVisibleMonth = uiState.currentVisibleMonth,
@@ -147,7 +164,7 @@ fun DatePicker(
                     selectedYear = uiState.selectedYearIndex,
                     onYearChange = { viewModel.updateSelectedYearIndex(it) },
                     years = uiState.years,
-                    months = uiState.months,
+                    months = monthsHolder,
                     height = height,
                     configuration = configuration
                 )
@@ -322,7 +339,7 @@ private fun DateView(
     selectedMonth: Month,
     height: Dp,
     configuration: DatePickerConfiguration,
-    days: List<String>?=null
+    days: List<String>? = null
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
@@ -330,7 +347,7 @@ private fun DateView(
         modifier = modifier
     ) {
         items(Constant.days) {
-            DateViewHeaderItem(day = it, configuration = configuration,days=days)
+            DateViewHeaderItem(day = it, configuration = configuration, days = days)
         }
         // since I may need few empty cells because every month starts with a different day(Monday, Tuesday, ..)
         // that's way I add some number X into the count
@@ -416,9 +433,9 @@ private fun DateViewHeaderItem(
     days: List<String>?
 ) {
     var dayName by remember(day.number) {
-        if(days?.size==7){
-            mutableStateOf(days[day.number-1])
-        }else{
+        if (days?.size == 7) {
+            mutableStateOf(days[day.number - 1])
+        } else {
             mutableStateOf(day.abbreviation)
         }
     }
