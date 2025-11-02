@@ -70,8 +70,11 @@ fun DatePicker(
     date: DatePickerDate = DefaultDate.defaultDate,
     selectionLimiter: SelectionLimiter = SelectionLimiter(),
     configuration: DatePickerConfiguration = DatePickerConfiguration.Builder().build(),
-    id: Int = 1
-) {
+    id: Int = 1,
+    days: List<String>?=null,
+    months: List<String>?=null,
+
+    ) {
     val viewModel: DatePickerViewModel = viewModel(key = "DatePickerViewModel$id")
     val uiState by viewModel.uiState.observeAsState(
         DatePickerUiState(
@@ -84,13 +87,22 @@ fun DatePicker(
     LaunchedEffect(key1 = Unit) { viewModel.setDate(date) }
 
     var height by remember { mutableStateOf(configuration.height) }
+    var monthName by remember(uiState.currentVisibleMonth.number) {
+        if(months?.size==12){
+            mutableStateOf(months[uiState.currentVisibleMonth.number])
+        }else{
+            mutableStateOf(uiState.currentVisibleMonth.name)
+        }
+    }
+
+
     Box(modifier = modifier.onGloballyPositioned {
         if (it.size.height == 0) return@onGloballyPositioned
         height = it.size.height.toDp() - configuration.headerHeight// Update the height
     }) {
         // TODO add sliding effect when next or previous arrow is pressed
         CalendarHeader(
-            title = "${uiState.currentVisibleMonth.name} ${uiState.selectedYear}",
+            title = "$monthName ${uiState.selectedYear}",
             onMonthYearClick = { viewModel.toggleIsMonthYearViewVisible() },
             onNextClick = { viewModel.moveToNextMonth() },
             onPreviousClick = { viewModel.moveToPreviousMonth() },
@@ -107,12 +119,10 @@ fun DatePicker(
                 visible = !uiState.isMonthYearViewVisible
             ) {
                 DateView(
-                    currentVisibleMonth = uiState.currentVisibleMonth,
                     selectedYear = uiState.selectedYear,
-                    selectedMonth = uiState.selectedMonth,
+                    currentVisibleMonth = uiState.currentVisibleMonth,
                     selectedDayOfMonth = uiState.selectedDayOfMonth,
                     selectionLimiter = selectionLimiter,
-                    height = height,
                     onDaySelected = {
                         viewModel.updateSelectedDayAndMonth(it)
                         onDateSelected(
@@ -121,7 +131,10 @@ fun DatePicker(
                             uiState.selectedDayOfMonth
                         )
                     },
-                    configuration = configuration
+                    selectedMonth = uiState.selectedMonth,
+                    height = height,
+                    configuration = configuration,
+                    days = days
                 )
             }
             AnimatedFadeVisibility(
@@ -308,7 +321,8 @@ private fun DateView(
     onDaySelected: (Int) -> Unit,
     selectedMonth: Month,
     height: Dp,
-    configuration: DatePickerConfiguration
+    configuration: DatePickerConfiguration,
+    days: List<String>?=null
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
@@ -316,7 +330,7 @@ private fun DateView(
         modifier = modifier
     ) {
         items(Constant.days) {
-            DateViewHeaderItem(day = it, configuration = configuration)
+            DateViewHeaderItem(day = it, configuration = configuration,days=days)
         }
         // since I may need few empty cells because every month starts with a different day(Monday, Tuesday, ..)
         // that's way I add some number X into the count
@@ -398,14 +412,23 @@ private fun DateViewBodyItem(
 @Composable
 private fun DateViewHeaderItem(
     configuration: DatePickerConfiguration,
-    day: Days
+    day: Days,
+    days: List<String>?
 ) {
+    var dayName by remember(day.number) {
+        if(days?.size==7){
+            mutableStateOf(days[day.number-1])
+        }else{
+            mutableStateOf(day.abbreviation)
+        }
+    }
+
     Box(
         contentAlignment = Alignment.Center, modifier = Modifier
             .size(configuration.selectedDateBackgroundSize)
     ) {
         Text(
-            text = day.abbreviation,
+            dayName,
             textAlign = TextAlign.Center,
             style = configuration.daysNameTextStyle.copy(
                 color = if (day.number == 1) configuration.sundayTextColor else configuration.daysNameTextStyle.color
