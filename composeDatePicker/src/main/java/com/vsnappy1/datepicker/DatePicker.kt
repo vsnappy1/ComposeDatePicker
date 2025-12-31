@@ -171,14 +171,7 @@ fun DatePicker(
             }
         }
     }
-    // Call onDateSelected when composition is completed
-    LaunchedEffect(key1 = Unit) {
-        onDateSelected(
-            uiState.selectedYear,
-            uiState.selectedMonth.number,
-            uiState.selectedDayOfMonth
-        )
-    }
+   
 }
 
 @Composable
