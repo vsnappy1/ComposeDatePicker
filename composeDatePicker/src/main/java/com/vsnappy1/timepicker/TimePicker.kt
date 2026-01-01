@@ -40,6 +40,38 @@ import com.vsnappy1.timepicker.ui.model.TimePickerConfiguration
 import com.vsnappy1.timepicker.ui.viewmodel.TimePickerViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * A Jetpack Compose function that provides a customizable time picker.
+ *
+ * This time picker allows the user to select a time by scrolling through hours, minutes, and
+ * AM/PM (if not in 24-hour format). The selected time is reported through the `onTimeSelected` callback.
+ *
+ * Example usage:
+ * ```
+ * TimePicker(
+ *     modifier = Modifier.height(200.dp),
+ *     onTimeSelected = { hour, minute ->
+ *         // Handle the selected time
+ *     },
+ *     time = TimePickerTime(hour = 10, minute = 30),
+ *     is24Hour = false
+ * )
+ * ```
+ *
+ * @param modifier The modifier to be applied to the time picker.
+ * @param onTimeSelected A callback that is invoked when the user stops scrolling on a new time.
+ *                       It provides the selected hour (0-23) and minute.
+ * @param is24Hour An optional boolean to force the time picker into 24-hour or 12-hour format.
+ *                 If null, it defaults to the system's setting.
+ * @param minuteGap The interval between minutes in the minute's column. Defaults to `MinuteGap.ONE`.
+ *                  Other options include `MinuteGap.FIVE`, `MinuteGap.TEN`, etc.
+ * @param time An optional `TimePickerTime` object to set the initial time displayed.
+ *             If null, the current system time is used.
+ * @param configuration An optional `TimePickerConfiguration` to customize the appearance of the
+ *                      time picker (e.g., text styles, colors, scaling).
+ * @param id An optional integer to create a unique key for the `ViewModel`. This is useful when
+ *           you have multiple `TimePicker` instances on the same screen.
+ */
 @Composable
 fun TimePicker(
     modifier: Modifier = Modifier,

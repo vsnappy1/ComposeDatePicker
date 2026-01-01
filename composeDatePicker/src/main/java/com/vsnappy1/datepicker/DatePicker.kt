@@ -63,6 +63,31 @@ import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 
+/**
+ * A composable function that provides a customizable date picker interface.
+ *
+ * It allows users to select a date (day, month, and year). The picker is highly
+ * configurable, offering options for styling, setting initial dates, and limiting
+ * the selectable date range. It also supports localization for day and month names.
+ *
+ * The `DatePicker` consists of two main views:
+ * 1.  **Date View**: A grid of days for the currently selected month.
+ * 2.  **Month and Year View**: A scrollable list for quickly selecting a different month and year.
+ *
+ * The user can toggle between these views by clicking on the header title (e.g., "August 2023").
+ *
+ * @param modifier The modifier to be applied to the `DatePicker`.
+ * @param onDateSelected A lambda that is invoked when a date is selected. It provides the selected
+ *   year, month (0-11), and day of the month.
+ * @param date The initially selected date to be displayed. Defaults to the current date.
+ * @param selectionLimiter Defines the selectable date range. Use `SelectionLimiter` to set
+ *   a `from` date, a `to` date, or both. Dates outside this range will be disabled.
+ * @param configuration An object to customize the appearance of the date picker, including
+ *   colors, fonts, sizes, and shapes. See [DatePickerConfiguration] for more details.
+ * @param id A unique identifier for the `DatePicker`. This is crucial when using multiple
+ *   `DatePicker` instances in the same composition to ensure their states are managed independently.
+ * @param days An optional list of 7 strings to replace the default day names (e.g., "S", "M", "T").
+ */
 @Composable
 fun DatePicker(
     modifier: Modifier = Modifier,
