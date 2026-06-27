@@ -46,13 +46,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vsnappy1.component.AnimatedFadeVisibility
 import com.vsnappy1.composedatepicker.R
-import com.vsnappy1.datepicker.ui.model.DatePickerConfiguration
 import com.vsnappy1.datepicker.data.Constant
 import com.vsnappy1.datepicker.data.model.DatePickerDate
 import com.vsnappy1.datepicker.data.model.DefaultDate
 import com.vsnappy1.datepicker.data.model.Month
 import com.vsnappy1.datepicker.data.model.SelectionLimiter
 import com.vsnappy1.datepicker.enums.Days
+import com.vsnappy1.datepicker.ui.model.DatePickerConfiguration
 import com.vsnappy1.datepicker.ui.model.DatePickerUiState
 import com.vsnappy1.datepicker.ui.viewmodel.DatePickerViewModel
 import com.vsnappy1.extension.noRippleClickable
@@ -87,6 +87,7 @@ import kotlin.math.ceil
  * @param id A unique identifier for the `DatePicker`. This is crucial when using multiple
  *   `DatePicker` instances in the same composition to ensure their states are managed independently.
  * @param days An optional list of 7 strings to replace the default day names (e.g., "S", "M", "T").
+ * @param months An optional list of 12 strings to replace the default month names.
  */
 @Composable
 fun DatePicker(
@@ -96,9 +97,8 @@ fun DatePicker(
     selectionLimiter: SelectionLimiter = SelectionLimiter(),
     configuration: DatePickerConfiguration = DatePickerConfiguration.Builder().build(),
     id: Int = 1,
-    days: List<String>? = null, //is intended to hold a list of day names in any language, which can replace the default day names.
-    months: List<String>? = null //is intended to hold a list of month names that will appear instead of the default month names.
-
+    days: List<String>? = null,
+    months: List<String>? = null
 ) {
     val viewModel: DatePickerViewModel = viewModel(key = "DatePickerViewModel$id")
     val uiState by viewModel.uiState.observeAsState(
@@ -113,33 +113,18 @@ fun DatePicker(
 
     var height by remember { mutableStateOf(configuration.height) }
 
-
-// This handles the month name by checking if a custom months list is provided and valid (exactly 12 items);
-// if so, use the corresponding month name from that list, else fallback to the default month name from uiState
-    var monthName by remember(uiState.currentVisibleMonth.number) {
-        if (months != null && months.size == 12) {
-            mutableStateOf(months[uiState.currentVisibleMonth.number])
-        } else {
-            mutableStateOf(uiState.currentVisibleMonth.name)
-        }
+    val customMonths = months.takeIf { it?.size == 12 }
+    val monthName = customMonths?.get(uiState.currentVisibleMonth.number)
+        ?: uiState.currentVisibleMonth.name
+    val monthItems = remember(customMonths, uiState.months) {
+        customMonths?.let { monthNames ->
+            List(uiState.months.size) { index -> monthNames[index % 12] }
+        } ?: uiState.months
     }
-
-// This manages the months list by validating if the custom months list is at least 12 items long;
-// if valid, store it, otherwise fall back to the default months list from uiState
-    var monthsHolder by remember {
-        if (months != null && months.size == 12) {
-            mutableStateOf(months)
-        } else {
-            mutableStateOf(uiState.months)
-        }
-    }
-
-
-
 
     Box(modifier = modifier.onGloballyPositioned {
         if (it.size.height == 0) return@onGloballyPositioned
-        height = it.size.height.toDp() - configuration.headerHeight// Update the height
+        height = it.size.height.toDp() - configuration.headerHeight
     }) {
         // TODO add sliding effect when next or previous arrow is pressed
         CalendarHeader(
@@ -165,12 +150,12 @@ fun DatePicker(
                     currentVisibleMonth = uiState.currentVisibleMonth,
                     selectedDayOfMonth = uiState.selectedDayOfMonth,
                     selectionLimiter = selectionLimiter,
-                    onDaySelected = {
-                        viewModel.updateSelectedDayAndMonth(it)
+                    onDaySelected = { selectedDay ->
+                        viewModel.updateSelectedDayAndMonth(selectedDay)
                         onDateSelected(
                             uiState.selectedYear,
-                            uiState.selectedMonth.number,
-                            uiState.selectedDayOfMonth
+                            uiState.currentVisibleMonth.number,
+                            selectedDay
                         )
                     },
                     selectedMonth = uiState.selectedMonth,
@@ -189,14 +174,13 @@ fun DatePicker(
                     selectedYear = uiState.selectedYearIndex,
                     onYearChange = { viewModel.updateSelectedYearIndex(it) },
                     years = uiState.years,
-                    months = monthsHolder,
+                    months = monthItems,
                     height = height,
                     configuration = configuration
                 )
             }
         }
     }
-   
 }
 
 @Composable
@@ -286,7 +270,6 @@ private fun SwipeLazyColumn(
                 alignment = alignment,
                 height = height,
                 onItemClick = { index ->
-                    onSelectedIndexChange(index)
                     coroutineScope.launch {
                         isAutoScrolling = true
                         onSelectedIndexChange(index)
@@ -450,13 +433,7 @@ private fun DateViewHeaderItem(
     day: Days,
     days: List<String>?
 ) {
-    var dayName by remember(day.number) {
-        if (days?.size == 7) {
-            mutableStateOf(days[day.number - 1])
-        } else {
-            mutableStateOf(day.abbreviation)
-        }
-    }
+    val dayName = days.takeIf { it?.size == 7 }?.get(day.number - 1) ?: day.abbreviation
 
     Box(
         contentAlignment = Alignment.Center, modifier = Modifier
@@ -529,7 +506,7 @@ private fun CalendarHeader(
             AnimatedFadeVisibility(visible = isPreviousNextVisible) {
                 Icon(
                     imageVector = Icons.Rounded.KeyboardArrowRight,
-                    contentDescription = stringResource(id = R.string.leftArrow),
+                    contentDescription = stringResource(id = R.string.rightArrow),
                     tint = configuration.headerArrowColor,
                     modifier = Modifier
                         .size(configuration.headerArrowSize)
