@@ -2,7 +2,7 @@
 An Android Jetpack Compose library that provides a Composable Date Picker / Time Picker functionality.
 
 [![](https://jitpack.io/v/vsnappy1/ComposeDatePicker.svg)](https://jitpack.io/#vsnappy1/ComposeDatePicker)
- <img alt="Static Badge" src="https://img.shields.io/badge/12.4k%2Fmonth-brightgreen?style=flat&label=downloads&color=%234ddd1c">
+ <img alt="Static Badge" src="https://img.shields.io/badge/13.4k%2Fmonth-brightgreen?style=flat&label=downloads&color=%234ddd1c">
 [![API](https://img.shields.io/badge/API-24%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=24)
 
 <div align="center">
