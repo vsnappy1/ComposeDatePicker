@@ -87,7 +87,9 @@ fun TimePicker(
     val is24: Boolean = is24Hour ?: DateFormat.is24HourFormat(LocalContext.current)
     val timePickerUiState = viewModel.getUiStateTimeProvided(timePickerTime, minuteGap, is24)
     val uiState by viewModel.uiState.observeAsState(timePickerUiState)
-    LaunchedEffect(key1 = Unit) { viewModel.updateUiState(timePickerTime, minuteGap, is24) }
+    LaunchedEffect(timePickerTime.hour, timePickerTime.minute, minuteGap, is24) {
+        viewModel.updateUiState(timePickerTime, minuteGap, is24)
+    }
 
     TimePickerView(
         modifier = modifier,
@@ -141,7 +143,6 @@ private fun TimePickerView(
                 height = it.size.height.toDp() // Update the height
             },
     ) {
-        Box(modifier = Modifier.fillMaxWidth())
         Box(
             modifier = Modifier
                 .padding(horizontal = medium)
@@ -226,7 +227,7 @@ private fun SwipeLazyColumn(
     ) {
         // we add some empty rows at the beginning and end of list to make it feel that it is a center focused list
         val count = items.size + configuration.numberOfTimeRowsDisplayed - 1
-        items(count) {
+        items(count, key = { it }) {
             SliderItem(
                 value = it,
                 selectedIndex = selectedIndex,

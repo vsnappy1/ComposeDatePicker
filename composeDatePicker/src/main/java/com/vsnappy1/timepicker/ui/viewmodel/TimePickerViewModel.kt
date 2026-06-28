@@ -71,15 +71,16 @@ internal class TimePickerViewModel : ViewModel() {
         is24: Boolean
     ): TimePickerUiState {
 
-        if (timePickerTime.hour < 0 || timePickerTime.hour > 23) {
+        if (timePickerTime.hour !in 0..23) {
             throw IllegalArgumentException("Invalid hour: ${timePickerTime.hour}, The hour value must be between 0 and 23 inclusive.")
         }
-        if (timePickerTime.minute < 0 || timePickerTime.minute > 59) {
+        if (timePickerTime.minute !in 0..59) {
             throw IllegalArgumentException("Invalid minute: ${timePickerTime.minute}, The minute value must be between 0 and 59 inclusive.")
         }
 
-        val minute: Int = Constant.getNearestNextMinute(timePickerTime.minute, minuteGap)
-        val hour: Int = timePickerTime.hour + if(minute == 0 && timePickerTime.minute != 0) 1 else 0
+        val minute = Constant.getNearestNextMinute(timePickerTime.minute, minuteGap)
+        val hour =
+            (timePickerTime.hour + if (minute == 0 && timePickerTime.minute != 0) 1 else 0) % 24
 
         return TimePickerUiState(
             is24Hour = is24,

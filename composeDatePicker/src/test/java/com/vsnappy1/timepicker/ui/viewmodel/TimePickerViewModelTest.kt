@@ -184,6 +184,24 @@ class TimePickerViewModelTest {
     }
 
     @Test
+    fun getSelectedTime_when_is24HourAndCurrentMinuteRoundsPastMidnight_shouldWrapHourToZero() {
+        //Given
+        val time = TimePickerTime(23, 57)
+
+        //When
+        viewModel.updateUiState(time, MinuteGap.FIVE, true)
+
+        //Then
+        viewModel.getSelectedTime()?.let {
+            assertEquals(0, it.hour)
+            assertEquals(0, it.minute)
+        }
+        viewModel.uiState.value?.let {
+            assertEquals("0", it.hours[it.selectedHourIndex])
+        }
+    }
+
+    @Test
     fun getSelectedTime_when_minuteGapIsFiveItIsElevenOClockAMAndCurrentMinuteIsMoreThan55_shouldMakeTheMinuteZeroAndIncrementTheHourAndChangeTimeOfTheDay() {
         //Given
         val time = TimePickerTime(11, 57)
